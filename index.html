@@ -1,0 +1,2551 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="light dark" />
+    <link rel="icon" href="data:," />
+    <title>RAZ 有声读本</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@600;700;800&display=swap" rel="stylesheet" />
+    <style>
+      :root {
+        --bg: #fff8ec;
+        --surface: #ffffff;
+        --surface-2: #fff1d6;
+        --ink: #2b2118;
+        --ink-soft: #6b5d4f;
+        --accent: #ff7a29;
+        --accent-ink: #ffffff;
+        --green: #2f9e5f;
+        --green-bg: #e2f6e9;
+        --red: #d9483b;
+        --red-bg: #fdeae8;
+        --gold: #f5b81d;
+        --sky: #2b8fd9;
+        --sky-bg: #e3f2fd;
+        --line: #f0dfc4;
+        --shadow: 0 6px 20px rgba(120, 72, 20, 0.14);
+        --radius: 20px;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #1d1712;
+          --surface: #2a211a;
+          --surface-2: #3a2c20;
+          --ink: #f7ead9;
+          --ink-soft: #c9b49c;
+          --accent: #ff8c42;
+          --green-bg: #173c26;
+          --red-bg: #47201c;
+          --sky-bg: #17334a;
+          --line: #4a3826;
+          --shadow: 0 6px 20px rgba(0, 0, 0, 0.45);
+        }
+      }
+      * { box-sizing: border-box; }
+      html, body { margin: 0; padding: 0; }
+      body {
+        background: var(--bg);
+        color: var(--ink);
+        font-family: "Nunito", system-ui, -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+        -webkit-tap-highlight-color: transparent;
+      }
+      h1, h2, h3, .display { font-family: "Baloo 2", "Nunito", system-ui, sans-serif; }
+      button { font-family: inherit; cursor: pointer; touch-action: manipulation; }
+      .page-img, .book-card, .level-card { touch-action: manipulation; }
+      .wrap { max-width: 980px; margin: 0 auto; padding: 12px 14px 32px; }
+      .hidden { display: none !important; }
+
+      /* ---------- Home / shelf ---------- */
+      .home-head { text-align: center; padding: 12px 0 4px; }
+      .home-head h1 { font-size: clamp(30px, 6vw, 44px); margin: 0 0 4px; letter-spacing: 0.5px; }
+      .home-head p { margin: 0; color: var(--ink-soft); font-weight: 700; font-size: 16px; }
+      .shelf { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin-top: 16px; }
+      .book-card {
+        background: var(--surface); border: 2px solid var(--line); border-radius: var(--radius);
+        box-shadow: var(--shadow); overflow: hidden; text-align: left; padding: 0; width: 100%;
+      }
+      .book-card img { width: 100%; display: block; aspect-ratio: 1100 / 711; object-fit: contain; background: #fff; }
+      .book-card .bc-body { padding: 14px 16px 18px; }
+      .book-card h2 { margin: 0 0 2px; font-size: 26px; }
+      .book-card .author { color: var(--ink-soft); font-weight: 700; margin: 0 0 10px; }
+      .badge {
+        display: inline-block; background: var(--gold); color: #4a3200; font-weight: 800;
+        border-radius: 999px; padding: 3px 12px; font-size: 14px; margin-bottom: 10px;
+      }
+      .prog-line { display: flex; align-items: center; gap: 10px; margin-top: 6px; }
+      .prog-bar { flex: 1; height: 12px; background: var(--surface-2); border-radius: 999px; overflow: hidden; }
+      .prog-fill { height: 100%; background: var(--green); border-radius: 999px; transition: width 0.3s; }
+      .prog-text { font-weight: 800; font-size: 14px; color: var(--ink-soft); white-space: nowrap; }
+      .open-btn {
+        margin-top: 12px; width: 100%; min-height: 42px; border: none; border-radius: 12px;
+        background: var(--accent); color: var(--accent-ink); font-size: 16px; font-weight: 800;
+      }
+      .open-btn:active { transform: scale(0.98); }
+      .done-stamp { color: var(--green); font-weight: 800; margin-top: 8px; font-size: 15px; }
+
+      /* ---------- Password gate ---------- */
+      .gate-card {
+        max-width: 420px; margin: 8vh auto 0; background: var(--surface); border: 2px solid var(--line);
+        border-radius: var(--radius); box-shadow: var(--shadow); padding: 28px 22px; text-align: center;
+      }
+      .gate-card .lock { font-size: 52px; line-height: 1; }
+      .gate-card h1 { font-size: 28px; margin: 10px 0 4px; }
+      .gate-card .gate-sub { color: var(--ink-soft); font-weight: 700; margin: 0 0 18px; font-size: 16px; }
+      .gate-input {
+        width: 100%; min-height: 58px; font-size: 22px; text-align: center; letter-spacing: 2px;
+        border: 2px solid var(--line); border-radius: 14px; background: var(--bg); color: var(--ink);
+        font-family: inherit; font-weight: 800; text-transform: uppercase;
+      }
+      .gate-input:focus { outline: none; border-color: var(--accent); }
+      .gate-btn {
+        width: 100%; min-height: 48px; margin-top: 12px; border: none; border-radius: 12px;
+        background: var(--accent); color: #fff; font-size: 17px; font-weight: 800;
+      }
+      .gate-btn:active { transform: scale(0.98); }
+      .gate-error { color: var(--red); font-weight: 800; margin: 14px 0 0; font-size: 15px; }
+      .gate-note { color: var(--ink-soft); font-size: 13px; margin: 16px 0 0; line-height: 1.6; }
+
+      /* ---------- Total home / dashboard ---------- */
+      .gem-bar {
+        display: flex; align-items: center; gap: 10px; background: var(--surface);
+        border: 2px solid var(--gold); border-radius: 999px; padding: 8px 20px;
+        box-shadow: var(--shadow); margin-top: 10px;
+      }
+      .gem-bar .gem-icon { font-size: 30px; }
+      .gem-bar .gem-label { font-weight: 800; font-size: 18px; flex: 1; }
+      .gem-bar .gem-num { font-family: "Baloo 2", sans-serif; font-size: 30px; font-weight: 800; color: var(--sky); }
+      .gem-chip {
+        margin-left: auto; font-weight: 800; font-size: 14px; background: var(--sky-bg);
+        border: 2px solid var(--line); border-radius: 999px; padding: 4px 10px; white-space: nowrap;
+      }
+      .home-grid { display: grid; grid-template-columns: 1fr; gap: 16px; margin: 16px auto 0; max-width: 460px; }
+      @media (max-width: 560px) { .home-grid { grid-template-columns: 1fr; } .big-tile { min-height: 200px !important; } }
+      .big-tile {
+        border-radius: var(--radius); border: 2px solid var(--line); background: var(--surface);
+        box-shadow: var(--shadow); padding: 24px 18px; display: flex; flex-direction: column;
+        align-items: center; justify-content: center; gap: 4px; min-height: 250px; color: var(--ink); width: 100%;
+      }
+      .big-tile:active { transform: scale(0.98); }
+      .big-tile .tile-emoji { font-size: 62px; line-height: 1.1; }
+      .big-tile .tile-name { font-family: "Baloo 2", sans-serif; font-size: 36px; font-weight: 800; }
+      .big-tile .tile-sub { color: var(--ink-soft); font-weight: 800; font-size: 16px; }
+      .big-tile .tile-note {
+        margin-top: 10px; background: var(--surface-2); border-radius: 999px;
+        padding: 4px 14px; font-weight: 800; font-size: 14px;
+      }
+      .level-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-top: 8px; }
+      .level-card {
+        background: var(--surface); border: 2px solid var(--line); border-radius: var(--radius);
+        box-shadow: var(--shadow); padding: 20px; text-align: left; width: 100%; color: var(--ink);
+      }
+      button.level-card:active { transform: scale(0.98); }
+      .level-card .lv-badge {
+        display: inline-block; background: var(--gold); color: #4a3200; font-weight: 800;
+        border-radius: 999px; padding: 4px 14px; font-size: 16px; margin-bottom: 10px;
+      }
+      .level-card .lv-books { font-size: 19px; font-weight: 800; margin: 4px 0; line-height: 1.4; }
+      .level-card .lv-go { color: var(--sky); font-weight: 800; margin: 6px 0 0; }
+      .level-card.empty { box-shadow: none; }
+      .level-card .lv-empty { color: var(--ink-soft); font-weight: 700; font-size: 16px; margin: 4px 0; }
+      .empty-shelf {
+        background: var(--surface); border: 2px dashed var(--line); border-radius: var(--radius);
+        padding: 44px 20px; text-align: center; margin-top: 8px;
+      }
+      .empty-shelf .es-emoji { font-size: 56px; }
+      .empty-shelf .es-title { font-size: 22px; font-weight: 800; margin: 10px 0 4px; }
+      .empty-shelf .es-sub { color: var(--ink-soft); font-weight: 700; margin: 0; }
+      .gem-party { color: var(--sky); font-weight: 800; font-size: 18px; margin-top: 8px; }
+
+      .mom-entry { text-align: center; margin-top: 30px; }
+      .mom-entry button {
+        background: none; border: 2px dashed var(--line); color: var(--ink-soft);
+        border-radius: 999px; padding: 8px 16px; font-size: 14px; font-weight: 700; min-height: 40px;
+      }
+
+      /* ---------- Reader ---------- */
+      .reader-layout { display: flex; gap: 14px; align-items: flex-start; }
+      .reader-side {
+        position: sticky; top: 10px; flex: none; width: 158px;
+        display: flex; flex-direction: column; gap: 8px;
+        background: var(--surface); border: 2px solid var(--line); border-radius: var(--radius);
+        box-shadow: var(--shadow); padding: 12px 10px;
+      }
+      .side-title { font-family: "Baloo 2", sans-serif; font-size: 19px; font-weight: 800; line-height: 1.25; margin: 0 0 2px; }
+      .side-btn {
+        width: 100%; min-height: 48px; border-radius: 12px; border: 2px solid var(--line);
+        background: var(--bg); color: var(--ink); font-size: 15px; font-weight: 800; text-align: left; padding: 6px 12px;
+      }
+      .side-btn:active { transform: scale(0.98); }
+      .reader-main { flex: 1; min-width: 0; }
+      .ctl-bar {
+        position: sticky; top: 0; z-index: 30; background: var(--bg);
+        padding: 6px 0 8px; margin-bottom: 10px; border-bottom: 2px solid var(--line);
+      }
+      .ctl-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+      .ctl-bar audio { width: 100%; margin-top: 6px; }
+      .ctl-row .speed-btn, .ctl-row .rec-btn, .ctl-row .save-btn, .ctl-row .nav-btn {
+        min-height: 46px; font-size: 14px; padding: 0 11px; white-space: nowrap;
+      }
+      .ctl-row .page-no { font-size: 13px; }
+      @media (max-width: 900px) {
+        .reader-side { width: 122px; }
+        .side-btn, .tab-btn { font-size: 14px; }
+      }
+      @media (max-width: 640px) {
+        .reader-layout { gap: 10px; }
+        .reader-side { width: 102px; padding: 10px 8px; }
+        .side-title { font-size: 15px; }
+        .side-btn { font-size: 13px; padding: 6px 8px; min-height: 44px; }
+      }
+      .topbar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 8px; }
+      .back-btn {
+        border: 2px solid var(--line); background: var(--surface); color: var(--ink);
+        border-radius: 999px; padding: 5px 12px; font-size: 14px; font-weight: 800; min-height: 38px;
+      }
+      .topbar .book-title { font-size: 22px; margin: 0; flex: 1; min-width: 120px; }
+      .side-tabs { display: flex; flex-direction: column; gap: 8px; margin-top: 6px; }
+      .tab-btn {
+        width: 100%; min-height: 48px; border-radius: 12px; border: 2px solid var(--line);
+        background: var(--surface); color: var(--ink); font-size: 16px; font-weight: 800; text-align: left; padding: 6px 12px;
+      }
+      .tab-btn.active { background: var(--sky); border-color: var(--sky); color: #fff; }
+      @media (max-width: 640px) { .tab-btn { font-size: 13px; padding: 6px 8px; min-height: 48px; } }
+      .page-img {
+        width: 100%; display: block; border-radius: var(--radius); border: 2px solid var(--line);
+        box-shadow: var(--shadow); background: var(--surface);
+        max-height: 54vh; object-fit: contain; cursor: zoom-in;
+      }
+      .page-stage { position: relative; }
+      /* "Read the whole page" is a small corner button on the page image */
+      .playall-mini {
+        position: absolute; top: 8px; right: 8px; z-index: 5; min-height: 32px; padding: 0 11px;
+        border: none; border-radius: 999px; background: var(--accent); color: #fff;
+        font-size: 13px; font-weight: 800; box-shadow: var(--shadow);
+      }
+      .playall-mini:active { transform: scale(0.96); }
+      .playall-mini.playing { background: var(--red); }
+      .zoom-hint { text-align: center; color: var(--ink-soft); font-weight: 700; font-size: 15px; margin: 8px 0 0; }
+      .img-zoom {
+        position: fixed; inset: 0; z-index: 100; background: rgba(20, 12, 4, 0.95);
+        display: flex; align-items: center; justify-content: center; padding: 10px; cursor: zoom-out;
+      }
+      .img-zoom img { max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 8px; }
+      .zoom-close {
+        position: absolute; top: 12px; right: 12px; min-height: 40px; border: none; border-radius: 999px;
+        background: var(--accent); color: #fff; font-size: 15px; font-weight: 800; padding: 0 16px;
+      }
+      .page-no { font-weight: 800; color: var(--ink-soft); font-size: 15px; white-space: nowrap; text-align: center; }
+      /* Read-all lives in the small corner button (.playall-mini) on the art for every book. */
+      .sentences { display: flex; flex-direction: column; gap: 8px; }
+      @media (min-width: 900px) {
+        .sentences { display: grid; grid-template-columns: 1fr 1fr; align-items: start; }
+      }
+      .sentence {
+        text-align: left; width: 100%; min-height: 48px; padding: 9px 14px; border-radius: 14px;
+        border: 2px solid var(--line); background: var(--surface); color: var(--ink);
+        font-size: 20px; font-weight: 700; line-height: 1.4; display: flex; gap: 10px; align-items: flex-start;
+      }
+      .sentence .spk { flex: none; font-size: 20px; line-height: 1.3; }
+      .sentence.speaking { border-color: var(--accent); background: var(--surface-2); }
+      .sentence.marked { border-color: var(--gold); background: #ffedb5; }
+      .sentence.marked .sent-text {
+        color: #8a4b00; font-weight: 800;
+        text-decoration: underline; text-decoration-color: var(--red);
+        text-decoration-thickness: 3px; text-underline-offset: 5px;
+      }
+      @media (prefers-color-scheme: dark) {
+        .sentence.marked { background: #5c430d; }
+        .sentence.marked .sent-text { color: #ffd98a; }
+      }
+      .quiz-return-bar {
+        display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+        background: #ffedb5; border: 2px solid var(--gold); border-radius: 14px;
+        padding: 10px 14px; margin-bottom: 10px;
+      }
+      @media (prefers-color-scheme: dark) { .quiz-return-bar { background: #5c430d; } }
+      .quiz-return-bar .eb-text { font-weight: 800; font-size: 16px; flex: 1; min-width: 160px; }
+      .quiz-return-bar button {
+        min-height: 38px; border: none; border-radius: 999px; background: var(--sky); color: #fff;
+        font-size: 13px; font-weight: 800; padding: 0 14px;
+      }
+      .mark-row { display: flex; gap: 8px; flex-wrap: wrap; margin: 10px 0 6px; }
+      .mark-toggle {
+        flex: 1; min-height: 38px; border-radius: 12px; border: 2px dashed var(--gold);
+        background: var(--surface); color: var(--ink); font-size: 14px; font-weight: 800; padding: 0 12px;
+      }
+      .mark-toggle.on { background: var(--gold); border-style: solid; color: #4a3200; }
+      .mark-toggle:active { transform: scale(0.98); }
+      .sentence:active { transform: scale(0.99); }
+      .mark-hint {
+        margin: 0 0 10px; padding: 9px 12px; border-radius: 12px;
+        background: var(--surface-2); color: var(--ink); font-size: 15px; font-weight: 700; line-height: 1.55;
+      }
+      .mark-hint.on { background: #ffedb5; color: #6b4200; }
+      @media (prefers-color-scheme: dark) { .mark-hint.on { background: #5c430d; color: #ffd98a; } }
+      /* While mark mode is on, sentence cards show a dashed gold edge so it is obvious
+         that tapping a card now underlines it instead of reading it aloud. */
+      .sentences.marking .sentence { border-style: dashed; border-color: var(--gold); }
+      .sentences.marking .sentence .spk { opacity: 0.35; }
+      .mark-clear {
+        min-height: 38px; border-radius: 12px; border: 2px solid var(--line);
+        background: var(--surface); color: var(--ink-soft); font-size: 13px; font-weight: 800; padding: 0 12px;
+      }
+      .speed-btn {
+        min-height: 48px; border-radius: 999px; border: 2px solid var(--line);
+        background: var(--surface); color: var(--ink); font-size: 15px; font-weight: 800; padding: 0 14px;
+      }
+      .speed-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+      .nav-btn {
+        min-height: 48px; border-radius: 999px; border: 2px solid var(--line);
+        background: var(--surface); color: var(--ink); font-size: 15px; font-weight: 800; padding: 0 14px;
+      }
+      .nav-btn:disabled { opacity: 0.35; }
+      .nav-btn.next { background: var(--green); border-color: var(--green); color: #fff; }
+      .finish-box {
+        margin-top: 12px; background: var(--green-bg); border-radius: var(--radius); padding: 14px; text-align: center;
+      }
+      .finish-box p { margin: 0 0 12px; font-size: 20px; font-weight: 800; }
+      .finish-box button {
+        min-height: 42px; border: none; border-radius: 12px; background: var(--green); color: #fff;
+        font-size: 15px; font-weight: 800; padding: 0 18px;
+      }
+
+      /* recorder controls — live in the single sticky control row at the top */
+      .rec-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+      .rec-btn {
+        min-height: 38px; border: none; border-radius: 999px; padding: 0 12px;
+        background: var(--red); color: #fff; font-size: 13px; font-weight: 800;
+      }
+      .rec-btn.recording { animation: pulse 1s infinite; }
+      @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.55; } }
+      .save-btn {
+        min-height: 38px; border: none; border-radius: 999px; padding: 0 11px;
+        background: var(--green); color: #fff; font-size: 13px; font-weight: 800;
+      }
+      .save-btn:disabled { opacity: 0.4; }
+      .saved-note { color: var(--green); font-weight: 800; margin: 8px 0 0; font-size: 15px; }
+      .rec-error { color: var(--red); font-weight: 700; margin: 8px 0 0; font-size: 15px; }
+
+      /* ---------- Words ---------- */
+      .word-list { display: flex; flex-direction: column; gap: 12px; }
+      .word-card {
+        background: var(--surface); border: 2px solid var(--line); border-radius: var(--radius);
+        padding: 13px 14px; box-shadow: var(--shadow);
+      }
+      .word-top { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+      .word-card .w { font-size: 27px; font-weight: 800; font-family: "Baloo 2", "Nunito", sans-serif; }
+      .word-card .ipa { color: var(--sky); font-weight: 800; font-size: 19px; }
+      .word-card .zh { color: var(--ink-soft); font-weight: 700; font-size: 16px; }
+      .word-meta { margin-top: 8px; display: flex; flex-direction: column; gap: 5px; }
+      .word-meta .lbl { font-size: 13px; font-weight: 800; color: var(--ink-soft); letter-spacing: 0.3px; }
+      .split-text { font-size: 20px; font-weight: 800; letter-spacing: 1px; }
+      .split-text .chunk { color: var(--accent); }
+      .split-text .dot { color: var(--ink-soft); margin: 0 2px; }
+      .example-row {
+        display: flex; align-items: center; gap: 10px; background: var(--surface-2);
+        border-radius: 12px; padding: 8px 12px; margin-top: 8px;
+      }
+      .example-row .ex { font-size: 19px; font-weight: 700; line-height: 1.4; flex: 1; }
+      .example-row .ex b { color: var(--accent); }
+      .ex-spk {
+        flex: none; width: 36px; height: 36px; border-radius: 999px; border: 2px solid var(--line);
+        background: var(--surface); font-size: 16px; line-height: 1;
+      }
+      .write-head { display: flex; align-items: center; margin-top: 10px; }
+      .write-head .lbl { font-size: 13px; font-weight: 800; color: var(--ink-soft); letter-spacing: 0.3px; }
+      .write-clear {
+        margin-left: auto; min-height: 36px; border: 2px solid var(--line); background: var(--surface);
+        color: var(--ink-soft); border-radius: 999px; padding: 0 12px; font-size: 13px; font-weight: 800;
+      }
+      .write-wrap { position: relative; margin-top: 6px; }
+      .write-grid {
+        height: 84px; border: 2px solid var(--line); border-radius: 10px; background-color: #fffdf8;
+        background-image: repeating-linear-gradient(to bottom, transparent 0, transparent 24px, var(--line) 24px, var(--line) 26px);
+        overflow: hidden;
+      }
+      @media (prefers-color-scheme: dark) { .write-grid { background-color: #241b14; } }
+      .write-grid::after {
+        content: ""; position: absolute; left: 2px; right: 2px; top: 50%;
+        border-top: 2px dashed rgba(217, 72, 59, 0.45);
+      }
+      canvas.write-canvas {
+        position: absolute; inset: 0; width: 100%; height: 100%;
+        touch-action: none; border-radius: 10px; z-index: 1;
+      }
+
+      /* read-the-word practice: listen once, then record yourself 3 times */
+      .say-head { display: flex; align-items: center; margin-top: 12px; }
+      .say-head .lbl { font-size: 13px; font-weight: 800; color: var(--ink-soft); letter-spacing: 0.3px; }
+      .say-status { font-weight: 800; font-size: 15px; color: var(--sky); margin: 8px 0; min-height: 20px; }
+      .listen-btn {
+        min-height: 38px; border: none; border-radius: 999px; padding: 0 12px;
+        background: var(--accent); color: #fff; font-size: 13px; font-weight: 800;
+      }
+      .listen-btn:disabled { opacity: 0.5; }
+      .word-card audio { width: 100%; margin-top: 10px; }
+      .story-btn {
+        width: 100%; min-height: 42px; border: none; border-radius: 12px; margin-top: 10px;
+        background: var(--sky); color: #fff; font-size: 15px; font-weight: 800;
+      }
+
+      /* ---------- Quiz ---------- */
+      .quiz-q {
+        background: var(--surface); border: 2px solid var(--line); border-radius: var(--radius);
+        padding: 14px 15px; margin-bottom: 12px;
+      }
+      .quiz-q .q-type { font-size: 13px; font-weight: 800; color: var(--sky); letter-spacing: 0.4px; }
+      .quiz-q h3 { margin: 5px 0 10px; font-size: 20px; line-height: 1.4; }
+      .opt {
+        display: block; width: 100%; text-align: left; min-height: 42px; padding: 8px 12px; margin-bottom: 8px;
+        border-radius: 12px; border: 2px solid var(--line); background: var(--bg); color: var(--ink);
+        font-size: 16px; font-weight: 700;
+      }
+      .opt.selected { border-color: var(--sky); background: var(--sky-bg); }
+      .opt.correct { border-color: var(--green); background: var(--green-bg); }
+      .opt.wrong { border-color: var(--red); background: var(--red-bg); }
+      .opt:disabled { opacity: 1; }
+      .feedback { font-weight: 800; font-size: 17px; margin: 6px 0 0; }
+      .feedback.good { color: var(--green); }
+      .feedback.bad { color: var(--red); }
+      .evidence-btn {
+        margin-top: 10px; min-height: 38px; border: 2px solid var(--sky); background: var(--sky-bg); color: var(--ink);
+        border-radius: 12px; padding: 0 13px; font-size: 14px; font-weight: 800;
+      }
+      .check-btn {
+        width: 100%; min-height: 44px; border: none; border-radius: 12px; background: var(--accent);
+        color: #fff; font-size: 17px; font-weight: 800; margin-top: 4px;
+      }
+      .part-title { font-size: 22px; margin: 16px 0 10px; }
+      .part-title:first-child { margin-top: 4px; }
+      .clue-btn {
+        margin-top: 2px; min-height: 38px; border: 2px dashed var(--gold); background: #fff8e1; color: var(--ink);
+        border-radius: 12px; padding: 0 13px; font-size: 14px; font-weight: 800;
+      }
+      @media (prefers-color-scheme: dark) { .clue-btn { background: #4a3a14; } }
+      .oral-q {
+        background: var(--surface); border: 2px solid var(--sky); border-radius: var(--radius);
+        padding: 14px 15px; margin-bottom: 12px;
+      }
+      .oral-q .q-type { font-size: 13px; font-weight: 800; color: var(--sky); letter-spacing: 0.4px; }
+      .oral-q h3 { margin: 5px 0 6px; font-size: 20px; line-height: 1.4; }
+      .oral-q .hint { color: var(--ink-soft); font-weight: 700; margin: 0 0 12px; font-size: 14px; }
+      .oral-q audio { width: 100%; margin-top: 12px; }
+      .score-box {
+        text-align: center; background: var(--surface); border: 2px solid var(--gold);
+        border-radius: var(--radius); padding: 18px; margin-bottom: 14px;
+      }
+      .score-box .big { font-size: 40px; font-family: "Baloo 2", sans-serif; font-weight: 800; }
+      .score-box p { margin: 6px 0 0; color: var(--ink-soft); font-weight: 700; }
+
+      /* ---------- Parent ledger ---------- */
+      .ledger-card {
+        background: var(--surface); border: 2px solid var(--line); border-radius: var(--radius);
+        padding: 15px; margin-bottom: 12px;
+      }
+      .ledger-card h3 { margin: 0 0 4px; font-size: 21px; }
+      .ledger-card .en { color: var(--ink-soft); font-weight: 700; font-size: 14px; margin: 0 0 10px; }
+      .ledger-card p { margin: 6px 0; font-size: 16px; }
+      .ledger-card audio { width: 100%; margin: 6px 0 10px; }
+      .ledger-note { color: var(--ink-soft); font-size: 14px; line-height: 1.6; }
+      .reset-btn {
+        margin-top: 10px; min-height: 40px; border: 2px solid var(--red); background: none; color: var(--red);
+        border-radius: 12px; padding: 0 13px; font-size: 13px; font-weight: 800;
+      }
+      /* ---------- Story stage (one picture, one sentence, ABC-style) ---------- */
+      .story-top { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+      .story-title { font-family: "Baloo 2", "Nunito", sans-serif; font-size: 19px; font-weight: 800; flex: 1; min-width: 0; line-height: 1.2; }
+      .round-btn {
+        width: 36px; height: 36px; flex: none; border-radius: 999px; border: 2px solid var(--line);
+        background: var(--surface); color: var(--ink); font-size: 17px; line-height: 1;
+        display: inline-flex; align-items: center; justify-content: center; padding: 0;
+      }
+      .round-btn:active { transform: scale(0.94); }
+      .round-btn.big { width: 30px; height: 30px; font-size: 14px; }
+      .round-btn.accent { background: var(--accent); border-color: var(--accent); color: #fff; }
+      .round-btn.rec { background: var(--surface); }
+      .round-btn.rec.ready { background: var(--red); border-color: var(--red); color: #fff; }
+      .round-btn.rec.done { background: var(--green); border-color: var(--green); color: #fff; font-size: 11px; }
+      .round-btn.rec.recording { background: var(--red); border-color: var(--red); color: #fff; animation: pulse 1s infinite; }
+      .round-btn:disabled { opacity: 0.35; }
+      #speed-toggle.active, #speed-normal.active { background: var(--accent); border-color: var(--accent); }
+      .step-bar { display: flex; align-items: center; gap: 5px; margin-bottom: 10px; }
+      .step-chip {
+        flex: 1; min-height: 38px; border-radius: 999px; border: 2px solid var(--line);
+        background: var(--surface); color: var(--ink); font-size: 13px; font-weight: 800; padding: 0 5px;
+      }
+      .step-chip.active { background: var(--sky); border-color: var(--sky); color: #fff; }
+      .step-chip.locked { opacity: 0.45; }
+      .step-chip.shake { animation: shake 0.4s; }
+      @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+      .step-arrow { color: var(--ink-soft); font-weight: 800; flex: none; }
+      .page-frac { color: var(--ink-soft); font-weight: 800; font-size: 12px; margin: 5px 2px 0; }
+      .sent-stage { padding: 8px 4px 2px; min-height: 54px; }
+      .sent-big { font-size: clamp(18px, 3.2vw, 23px); font-weight: 800; line-height: 1.4; margin: 0; }
+      .sent-big.marked {
+        background: #ffedb5; border-radius: 8px; padding: 2px 8px;
+        text-decoration: underline; text-decoration-color: var(--red);
+        text-decoration-thickness: 3px; text-underline-offset: 5px;
+      }
+      @media (prefers-color-scheme: dark) { .sent-big.marked { background: #5c430d; } }
+      .story-controls { display: flex; justify-content: center; align-items: center; gap: 14px; margin-top: 8px; }
+      /* Story pages (nessa 2026-10-20): walk page by page, never sentence by
+         sentence — all of a page's sentences sit together with its picture.
+         Little text on the page -> stacked layout (picture top, sentences
+         below); lots of text -> side layout (picture left, sentences right).
+         The four buttons live in a slim vertical rail on the right in both
+         layouts, and every picture in the same layout renders in a
+         same-size box (fixed height, object-fit: contain, never cropped). */
+      #pane-read.pg { display: grid; grid-template-columns: minmax(0, 1fr) 32px; column-gap: 8px; grid-auto-flow: dense; }
+      #pane-read.pg > * { grid-column: 1; min-width: 0; }
+      #pane-read.pg > .story-controls { grid-column: 2; grid-row: 1 / span 9; flex-direction: column; justify-content: flex-start; gap: 8px; margin-top: 2px; }
+      #pane-read.pg .page-img { height: 36vh; max-height: none; }
+      #pane-read.pg-side { grid-template-columns: minmax(0, 54%) minmax(0, 1fr) 32px; }
+      #pane-read.pg-side > .quiz-return-bar { grid-column: 1 / span 2; }
+      #pane-read.pg-side > .page-stage { grid-column: 1; }
+      #pane-read.pg-side > .page-frac { grid-column: 1; }
+      #pane-read.pg-side > .sent-stage { grid-column: 2; grid-row: span 2; align-self: start; }
+      #pane-read.pg-side > .story-controls { grid-column: 3; grid-row: 1 / span 9; }
+      #pane-read.pg-side > .sent-rec-strip, #pane-read.pg-side > .saved-note, #pane-read.pg-side > .rec-error, #pane-read.pg-side > .finish-box { grid-column: 1 / -1; }
+      @media (max-width: 720px) {
+        #pane-read.pg-side { grid-template-columns: minmax(0, 1fr) 32px; }
+        #pane-read.pg-side > .page-stage { grid-column: 1; }
+        #pane-read.pg-side > .page-frac { grid-column: 1; }
+        #pane-read.pg-side > .sent-stage { grid-column: 1; grid-row: auto; }
+        #pane-read.pg-side > .story-controls { grid-column: 2; grid-row: 1 / span 9; }
+      }
+      /* A page's sentences, grouped: the active one is full ink, the rest
+         softer; tapping a line makes it active and reads it aloud. */
+      .page-sents { display: flex; flex-direction: column; gap: 4px; }
+      .sent-line {
+        display: block; width: 100%; text-align: left; background: none; border: none; border-radius: 8px;
+        padding: 3px 6px; font-family: inherit; font-size: clamp(17px, 3vw, 22px); font-weight: 800;
+        line-height: 1.45; color: var(--ink-soft);
+      }
+      .sent-line:active { transform: scale(0.99); }
+      .sent-line.active { color: var(--ink); }
+      .sent-line.marked {
+        background: #ffedb5;
+        text-decoration: underline; text-decoration-color: var(--red);
+        text-decoration-thickness: 3px; text-underline-offset: 5px;
+      }
+      @media (prefers-color-scheme: dark) { .sent-line.marked { background: #5c430d; } }
+      .sent-rec-strip { display: flex; gap: 10px; align-items: center; margin-top: 14px; }
+      .sent-rec-strip audio { flex: 1; min-width: 0; }
+      .say-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 12px; }
+      .listen3-btn {
+        min-height: 38px; border: none; border-radius: 999px; padding: 0 12px;
+        background: var(--accent); color: #fff; font-size: 13px; font-weight: 800;
+      }
+      .listen3-btn:disabled { opacity: 0.5; }
+      .say-count { font-weight: 800; color: var(--sky); font-size: 14px; min-width: 32px; }
+      .word-rec-btn:disabled { opacity: 0.4; }
+      @media (prefers-reduced-motion: reduce) {
+        .step-chip.shake, .round-btn.rec.recording { animation: none; }
+      }
+
+      .section-title { font-size: 26px; margin: 8px 0 14px; }
+      @media (prefers-reduced-motion: reduce) {
+        .rec-btn.recording { animation: none; }
+        .prog-fill { transition: none; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <!-- ============ PASSWORD GATE ============ -->
+      <section id="view-gate">
+        <div class="gate-card">
+          <div class="lock">🔒</div>
+          <h1>输入密码 Password</h1>
+          <form id="gate-form">
+            <input class="gate-input" id="gate-input" type="text" autocomplete="off" autocapitalize="characters" placeholder="PASSWORD" aria-label="密码" />
+            <button class="gate-btn" type="submit">📚 进入书架 Enter</button>
+          </form>
+          <p class="gate-error hidden" id="gate-error">密码不对哦，请再试一次。</p>
+          <p class="gate-note">给妈妈看：输对一次后，这台设备下次打开就不用再输了。</p>
+        </div>
+      </section>
+
+      <!-- ============ TOTAL HOME ============ -->
+      <section id="view-dashboard" class="hidden">
+        <div class="gem-bar">
+          <span class="gem-icon">💎</span>
+          <span class="gem-label">我的宝石 Gems</span>
+          <span class="gem-num">0</span>
+        </div>
+        <div class="home-grid">
+          <button class="big-tile" id="tile-raz">
+            <span class="tile-emoji">📚</span>
+            <span class="tile-name">RAZ</span>
+            <span class="tile-sub">分级阅读 Reading Levels</span>
+          </button>
+        </div>
+        <div class="mom-entry">
+          <button id="open-ledger">给妈妈看 · 学习记录（中文）</button>
+        </div>
+      </section>
+
+      <!-- ============ RAZ AREA ============ -->
+      <section id="view-raz" class="hidden">
+        <div class="topbar">
+          <button class="back-btn js-home">🏠 总首页 Home</button>
+          <h2 class="book-title">📚 RAZ 分级阅读</h2>
+          <span class="gem-chip">💎 <span class="gem-num">0</span></span>
+        </div>
+        <div class="level-grid">
+          <div class="level-card empty">
+            <span class="lv-badge">Level F</span>
+            <p class="lv-empty">📭 还没有书</p>
+          </div>
+          <button class="level-card" id="level-g">
+            <span class="lv-badge">Level G</span>
+            <p class="lv-books">18 本书 Books</p>
+            <p class="lv-go">书架 →</p>
+          </button>
+          <div class="level-card empty">
+            <span class="lv-badge">Level H</span>
+            <p class="lv-empty">📭 还没有书</p>
+          </div>
+        </div>
+      </section>
+
+
+      <!-- ============ LEVEL G SHELF ============ -->
+      <section id="view-home" class="hidden">
+        <div class="topbar">
+          <button class="back-btn" id="shelf-to-raz">← RAZ 区</button>
+          <button class="back-btn js-home">🏠 总首页 Home</button>
+          <span class="gem-chip">💎 <span class="gem-num">0</span></span>
+        </div>
+        <div class="home-head">
+          <h1>📚 My Reading Shelf</h1>
+          <p>Level G</p>
+        </div>
+        <div class="shelf" id="shelf"></div>
+      </section>
+
+      <!-- ============ READER ============ -->
+      <section id="view-reader" class="hidden">
+        <div class="story-top">
+          <button class="round-btn" id="back-home" type="button" aria-label="书架 Bookshelf">←</button>
+          <span class="story-title" id="reader-title"></span>
+          <button class="round-btn" id="speed-toggle" type="button" aria-label="慢速 Slow">🐢</button>
+          <button class="round-btn" id="speed-normal" type="button" aria-label="正常语速 Normal speed">🐇</button>
+          <span class="gem-chip">💎 <span class="gem-num">0</span></span>
+        </div>
+        <div class="step-bar">
+          <button class="step-chip" data-tab="words" type="button">⭐ 生词 Words</button>
+          <span class="step-arrow">›</span>
+          <button class="step-chip" data-tab="read" type="button">📖 故事 Story</button>
+          <span class="step-arrow">›</span>
+          <button class="step-chip" data-tab="quiz" type="button">✏️ 测验 Quiz</button>
+        </div>
+
+        <div id="pane-words" class="hidden">
+          <div class="word-list" id="word-list"></div>
+        </div>
+
+        <div id="pane-read" class="hidden">
+          <div class="quiz-return-bar hidden" id="quiz-return-bar">
+            <span class="eb-text">📖 找一找，找到的句子点「✏️ 标记」</span>
+            <button id="mark-current" type="button">✏️ 标记这句</button>
+            <button id="quiz-back" type="button">回测验 →</button>
+          </div>
+          <div class="page-stage">
+            <img class="page-img" id="page-img" alt="" />
+          </div>
+          <p class="page-frac" id="page-frac"></p>
+          <div class="sent-stage" id="sent-stage">
+            <div class="page-sents" id="sent-text"></div>
+          </div>
+          <div class="story-controls">
+            <button class="round-btn big" id="prev-sent" type="button" aria-label="上一页 Prev page">‹</button>
+            <button class="round-btn big accent" id="sent-listen" type="button" aria-label="听一遍 Listen">🔊</button>
+            <button class="round-btn big rec" id="sent-record" type="button" aria-label="录音 Record" disabled>🎙</button>
+            <button class="round-btn big" id="next-sent" type="button" aria-label="下一页 Next page">›</button>
+          </div>
+          <div class="sent-rec-strip hidden" id="sent-rec-strip">
+            <audio id="sent-rec-playback" controls></audio>
+            <button class="save-btn" id="sent-rec-save" type="button">Save 保存</button>
+          </div>
+          <p class="saved-note hidden" id="sent-saved-note">✅ Saved!</p>
+          <p class="rec-error hidden" id="sent-rec-error"></p>
+          <div class="finish-box hidden" id="finish-box">
+            <p>🎉</p>
+            <button id="goto-quiz" type="button">测验 Quiz →</button>
+          </div>
+        </div>
+
+        <div id="pane-quiz" class="hidden">
+          <div id="quiz-area"></div>
+          <div id="oral-area"></div>
+        </div>
+      </section>
+
+      <!-- ============ PARENT LEDGER ============ -->
+      <section id="view-ledger" class="hidden">
+        <div class="topbar">
+          <button class="back-btn" id="ledger-back">← 返回总首页</button>
+          <h2 class="book-title">妈妈账本</h2>
+        </div>
+        <p class="ledger-note">这里记录孩子在这台设备上读了哪些页、小测验最好成绩，以及保存下来的跟读录音和问答题口述回答（点开就能听）。所有录音只保存在这台设备的浏览器本地，不会上传到任何服务器；换设备或清理浏览器数据会丢失。</p>
+        <div id="ledger-area" style="margin-top:14px;"></div>
+      </section>
+    </div>
+
+    <!-- ============ PAGE IMAGE ZOOM (tap the page image to see it full-screen) ============ -->
+    <div class="img-zoom hidden" id="img-zoom">
+      <img id="img-zoom-img" alt="" />
+      <button class="zoom-close" id="img-zoom-close" type="button">✕ 关 Close</button>
+    </div>
+
+    <script>
+      "use strict";
+
+      /* ================= Data (transcribed verbatim from the PDFs nessa uploaded; pack: english-plan/raz-books) ================= */
+      var BOOKS = [
+        {
+          id: "a-seed-grows", title: "A Seed Grows", author: "Julie Harding", level: "G",
+          cover: "assets/image-001.jpg",
+          pages: [
+            { image: "assets/image-002.jpg", pageNo: 3, sentences: ["A small seed falls to the ground and becomes buried in the soft soil."] },
+            { image: "assets/image-003.jpg", pageNo: 4, sentences: ["The seed is buried in the soft soil, and the rain falls."] },
+            { image: "assets/image-004.jpg", pageNo: 5, sentences: ["The rain soaks into the soil that holds the small seed."] },
+            { image: "assets/image-005.jpg", pageNo: 6, sentences: ["The small seed soaks up water from the rain."] },
+            { image: "assets/image-006.jpg", pageNo: 7, sentences: ["The water helps the seed, and roots grow down deep into the soil."] },
+            { image: "assets/image-007.jpg", pageNo: 8, sentences: ["The leaves and a stem grow up through the ground.", "The leaves gather in the sunshine."] },
+            { image: "assets/image-008.jpg", pageNo: 9, sentences: ["The plant uses sunshine to make food.", "The rain and the soil help the small plant."] },
+            { image: "assets/image-009.jpg", pageNo: 10, sentences: ["The plant grows taller, and more leaves grow on the stem.", "The roots grow longer.", "They go deep in the ground."] },
+            { image: "assets/image-010.jpg", pageNo: 11, sentences: ["The big plant grows flowers.", "The flowers make seeds."] },
+            { image: "assets/image-011.jpg", pageNo: 12, sentences: ["A new seed falls into the soft soil.", "What will happen next?"] }
+          ],
+          words: [
+            { word: "buried", meaningZh: "埋在（土）里", split: ["bur", "ied"], ipa: "/ˈber.id/", example: "The seed is buried in the soft soil." },
+            { word: "soak up", meaningZh: "吸收（水）", split: ["s", "oa", "k", "up"], ipa: "/soʊk ʌp/", example: "The small seed soaks up water from the rain." },
+            { word: "stem", meaningZh: "茎", split: ["st", "e", "m"], ipa: "/stem/", example: "The leaves and a stem grow up through the ground." },
+            { word: "soil", meaningZh: "土壤、泥土", split: ["s", "oi", "l"], ipa: "/sɔɪl/", example: "A new seed falls into the soft soil." },
+            { word: "sunshine", meaningZh: "阳光", split: ["sun", "shine"], ipa: "/ˈsʌn.ʃaɪn/", example: "The leaves gather in the sunshine." }
+          ],
+          quiz: [
+            { type: "detail", question: "Where does the small seed become buried?", options: ["In the soft soil", "In the water", "On a leaf"], answer: 0 },
+            { type: "detail", question: "What helps the seed so that roots grow down deep into the soil?", options: ["The wind", "The water", "The flowers"], answer: 1 },
+            { type: "detail", question: "What do the flowers make?", options: ["Food", "Leaves", "Seeds"], answer: 2 },
+            { type: "inference", question: "A new seed falls into the soft soil at the end. What will most likely happen next?", options: ["It will grow into a new plant", "It will fly away", "It will become rain"], answer: 0 },
+            { type: "evidence", question: "Which sentence tells us that roots grow deep?", options: ["The leaves gather in the sunshine.", "The water helps the seed, and roots grow down deep into the soil.", "The big plant grows flowers."], answer: 1 }
+          ],
+          oralQuestions: [
+            "How does a small seed grow into a big plant? Tell me the story of the seed.",
+            "What helps the plant grow? Tell me what you remember from the book."
+          ]
+        },
+        {
+          id: "animal-eyes", title: "Animal Eyes", author: "Pam Bull", level: "G",
+          cover: "assets/image-012.jpg",
+          pages: [
+            { image: "assets/image-013.jpg", pageNo: 3, sentences: ["You use your eyes to see.", "Animals use their eyes to see, too."] },
+            { image: "assets/image-014.jpg", pageNo: 4, sentences: ["Animal eyes can be small or large.", "Some animal eyes can look very strange!"] },
+            { image: "assets/image-015.jpg", pageNo: 5, sentences: ["What animal has eyes that look like this?"] },
+            { image: "assets/image-016.jpg", pageNo: 6, sentences: ["This spider does.", "It has eight eyes that look like little dots.", "Most spiders can't see very clearly.", "But many spiders are very good at seeing things move."] },
+            { image: "assets/image-017.jpg", pageNo: 7, sentences: ["What animal has eyes that look like this?"] },
+            { image: "assets/image-018.jpg", pageNo: 8, sentences: ["This owl does.", "Its eyes help it see well at night.", "An owl cannot move its eyes.", "It must turn its head to look around."] },
+            { image: "assets/image-019.jpg", pageNo: 9, sentences: ["What animal has eyes that look like this?"] },
+            { image: "assets/image-020.jpg", pageNo: 10, sentences: ["This kind of lizard does.", "Each eye can look in a different place.", "The left eye sees one thing.", "The right eye sees something different at the same time."] },
+            { image: "assets/image-021.jpg", pageNo: 11, sentences: ["What animal has eyes that look like this?"] },
+            { image: "assets/image-022.jpg", pageNo: 12, sentences: ["This dragonfly has eyes that are made up of many tiny eyes.", "Dragonflies are very good at seeing things move.", "Use your eyes to see all the animal eyes around you."] }
+          ],
+          words: [
+            { word: "strange", meaningZh: "奇怪的", split: ["str", "a", "nge"], ipa: "/streɪndʒ/", example: "Some animal eyes can look very strange!" },
+            { word: "clearly", meaningZh: "清楚地", split: ["clear", "ly"], ipa: "/ˈklɪr.li/", example: "Most spiders can't see very clearly." },
+            { word: "different", meaningZh: "不同的", split: ["dif", "fer", "ent"], ipa: "/ˈdɪf.rənt/", example: "Each eye can look in a different place." },
+            { word: "dragonfly", meaningZh: "蜻蜓", split: ["drag", "on", "fly"], ipa: "/ˈdræɡ.ən.flaɪ/", example: "This dragonfly has eyes that are made up of many tiny eyes." },
+            { word: "night", meaningZh: "夜晚", split: ["n", "igh", "t"], ipa: "/naɪt/", example: "Its eyes help it see well at night." }
+          ],
+          quiz: [
+            { type: "detail", question: "How many eyes does the spider have?", options: ["Two eyes", "Eight eyes", "Many tiny eyes"], answer: 1 },
+            { type: "detail", question: "Why must an owl turn its head to look around?", options: ["It cannot move its eyes", "It cannot see at night", "Its eyes are too small"], answer: 0 },
+            { type: "detail", question: "What are a dragonfly's eyes made up of?", options: ["Little dots", "Two big eyes", "Many tiny eyes"], answer: 2 },
+            { type: "inference", question: "Which animal can see two different things at the same time?", options: ["The owl", "The kind of lizard (chameleon)", "The spider"], answer: 1 },
+            { type: "evidence", question: "Which sentence tells us that an owl sees well at night?", options: ["Its eyes help it see well at night.", "An owl cannot move its eyes.", "Some animal eyes can look very strange!"], answer: 0 }
+          ],
+          oralQuestions: [
+            "Which animal's eyes do you think are the most strange? Why?",
+            "Tell me two things you learned about animal eyes."
+          ]
+        },
+        {
+          id: "going-to-the-dentist", title: "Going to the Dentist", author: "John Rousselle", level: "G",
+          cover: "assets/image-023.jpg",
+          pages: [
+            { image: "assets/image-024.jpg", pageNo: 3, sentences: ["I'm going to the dentist.", "I'm a little scared."] },
+            { image: "assets/image-025.jpg", pageNo: 4, sentences: ["A friendly woman named Jamie asks me to wait.", "She says I can read, play with toys, or watch a movie."] },
+            { image: "assets/image-026.jpg", pageNo: 5, sentences: ["After a few minutes, Dana calls my name.", "Dana is the dentist's helper."] },
+            { image: "assets/image-027.jpg", pageNo: 6, sentences: ["Dana shows me around the office.", "She teaches me how to clean my teeth at home."] },
+            { image: "assets/image-028.jpg", pageNo: 7, sentences: ["Dana says she will make my teeth super clean.", "She shows me the tools she will use.", "Some of the tools look scary, but the cleaning doesn't hurt."] },
+            { image: "assets/image-029.jpg", pageNo: 8, sentences: ["Next, Dana takes special pictures of my teeth."] },
+            { image: "assets/image-030.jpg", pageNo: 9, sentences: ["The dentist comes to check my teeth.", "She looks at the pictures of my teeth."] },
+            { image: "assets/image-031.jpg", pageNo: 10, sentences: ["The dentist says I need a filling.", "I will have to come back another day."] },
+            { image: "assets/image-032.jpg", pageNo: 11, sentences: ["I ask if getting the filling will hurt.", "The dentist says it won't hurt much because it will be small."] },
+            { image: "assets/image-033.jpg", pageNo: 12, sentences: ["The dentist says it's good we found the problem early.", "I'm not happy I need a filling, but I'm glad I went to the dentist!"] }
+          ],
+          words: [
+            { "word": "scared", "meaningZh": "害怕的", "split": ["sc", "ared"], "ipa": "/skerd/", "phonicsNote": "are 在这里发 /er/", "example": "I'm a little scared." },
+            { "word": "friendly", "meaningZh": "友好的", "split": ["friend", "ly"], "ipa": "/ˈfrendli/", "phonicsNote": "iend 发长音 /iː/", "example": "A friendly woman named Jamie asks me to wait." },
+            { "word": "helper", "meaningZh": "助手", "split": ["hel", "per"], "ipa": "/ˈhelpər/", "phonicsNote": "er 在这里发 /ər/", "example": "Dana is the dentist's helper." },
+            { "word": "filling", "meaningZh": "补牙", "split": ["fill", "ing"], "ipa": "/ˈfɪlɪŋ/", "phonicsNote": "fill + ing 连起来", "example": "The dentist says I need a filling." },
+            { "word": "hurt", "meaningZh": "疼", "split": ["h", "ur", "t"], "ipa": "/hɜːrt/", "phonicsNote": "ur 发 /ɜːr/", "example": "Some of the tools look scary, but the cleaning doesn't hurt." }
+          ],
+          quiz: [
+            { "type": "detail", "question": "What does Jamie say the child can do while waiting?", "options": ["Only wait and do nothing", "Read, play with toys, or watch a movie", "Clean her teeth"], "answer": 1 },
+            { "type": "detail", "question": "Who is Dana?", "options": ["The dentist", "The dentist's helper", "The child's teacher"], "answer": 1 },
+            { "type": "detail", "question": "What does the dentist say the child needs?", "options": ["A cleaning", "Nothing", "A filling"], "answer": 2 },
+            { "type": "inference", "question": "How does the child feel about the visit at the end?", "options": ["Glad she went to the dentist", "Angry at the dentist", "Scared to go home"], "answer": 0 },
+            { "type": "evidence", "question": "Which sentence tells us the cleaning doesn't hurt?", "options": ["She shows me the tools she will use.", "Dana says she will make my teeth super clean.", "Some of the tools look scary, but the cleaning doesn't hurt."], "answer": 2 }
+          ],
+          oralQuestions: ["Tell me what happened when the child went to the dentist, from arriving to leaving.", "The child was a little scared at first. What would you say to a friend who is scared to go to the dentist? Why?"]
+        },
+        {
+          id: "gordon-finds-his-way", title: "Gordon Finds His Way", author: "Racheal Rice", level: "G",
+          cover: "assets/image-034.jpg",
+          pages: [
+            { image: "assets/image-035.jpg", pageNo: 3, sentences: ["Gordon stood alone in the hall.", "He hadn't heard the bell to go inside."] },
+            { image: "assets/image-036.jpg", pageNo: 4, sentences: ["He had to go to music class, but he didn't know where to go.", "Gordon was a new kid at school."] },
+            { image: "assets/image-037.jpg", pageNo: 5, sentences: ["He knew the music room wasn't on the first floor.", "His classroom was on the first floor."] },
+            { image: "assets/image-038.jpg", pageNo: 6, sentences: ["So, Gordon went up the stairs.", "He knew he had to hurry.", "His teacher would be worried."] },
+            { image: "assets/image-039.jpg", pageNo: 7, sentences: ["At the top of the stairs, Gordon turned to the right.", "He went down the hall.", "On the left, he saw a door.", "It might be the music room, he thought."] },
+            { image: "assets/image-040.jpg", pageNo: 8, sentences: ["No, it was the art room.", "Gordon asked the teacher, \"Do you know where the music room is?\"", "\"Sure,\" the teacher said."] },
+            { image: "assets/image-041.jpg", pageNo: 9, sentences: ["\"Turn to the right and go past the stairs.", "On your left, you'll see a door like this one.", "That is the music room.\""] },
+            { image: "assets/image-042.jpg", pageNo: 10, sentences: ["Gordon thanked her and hurried down the hall.", "Gordon's teacher, Mr. Lewis, was outside the music room."] },
+            { image: "assets/image-043.jpg", pageNo: 11, sentences: ["\"There you are!\" Mr. Lewis said.", "\"Mr. Green asked me to find you.\"", "Gordon smiled.", "\"I found you first!\""] },
+            { image: "assets/image-044.jpg", pageNo: 12, sentences: [] }
+          ],
+          words: [
+            { "word": "alone", "meaningZh": "独自的", "split": ["a", "lone"], "ipa": "/əˈloʊn/", "phonicsNote": "o_e 发长音 /oʊ/", "example": "Gordon stood alone in the hall." },
+            { "word": "music", "meaningZh": "音乐", "split": ["mu", "sic"], "ipa": "/ˈmjuːzɪk/", "phonicsNote": "u 在这里发 /juː/（you 的音）", "example": "He had to go to music class, but he didn't know where to go." },
+            { "word": "worried", "meaningZh": "担心的", "split": ["wor", "ried"], "ipa": "/ˈwɜːrid/", "phonicsNote": "wor 发 /wɜːr/；结尾 y 发 /i/", "example": "His teacher would be worried." },
+            { "word": "stairs", "meaningZh": "楼梯", "split": ["st", "airs"], "ipa": "/sterz/", "phonicsNote": "air 发 /er/", "example": "So, Gordon went up the stairs." },
+            { "word": "art", "meaningZh": "美术", "split": ["ar", "t"], "ipa": "/ɑːrt/", "phonicsNote": "ar 发 /ɑːr/", "example": "No, it was the art room." }
+          ],
+          quiz: [
+            { "type": "detail", "question": "Why was Gordon alone in the hall?", "options": ["He hadn't heard the bell to go inside", "He was waiting for a friend", "He was looking for his classroom"], "answer": 0 },
+            { "type": "detail", "question": "Which class did Gordon have to go to?", "options": ["Art class", "Music class", "Gym class"], "answer": 1 },
+            { "type": "detail", "question": "What room was behind the first door Gordon opened?", "options": ["The stairs", "The art room", "The music room"], "answer": 2 },
+            { "type": "inference", "question": "How did Gordon feel when Mr. Lewis found him?", "options": ["Happy", "Sad", "Angry"], "answer": 0 },
+            { "type": "evidence", "question": "Which sentence tells us where Gordon's classroom was?", "options": ["His classroom was on the first floor.", "His classroom was on the second floor.", "His classroom was next to the music room."], "answer": 0 }
+          ],
+          oralQuestions: ["Tell me how Gordon found the music room, from the hall to the end.", "Gordon was a new kid and got lost. What would you do if you were new and didn't know where to go? Why?"]
+        },
+        {
+          id: "groundhog-goes-outside", title: "Groundhog Goes Outside", author: "Karen Mockler", level: "G",
+          cover: "assets/image-045.jpg",
+          pages: [
+            { image: "assets/image-046.jpg", pageNo: 3, sentences: ["It was the deep of winter.", "Gus was worried.", "He couldn't find his shadow anywhere."] },
+            { image: "assets/image-047.jpg", pageNo: 4, sentences: ["\"Have you seen my shadow?\"", "Gus asked Dad.", "\"When did you see it last?\"", "Dad asked."] },
+            { image: "assets/image-048.jpg", pageNo: 5, sentences: ["\"Have you seen my shadow?\"", "Gus asked Mom.", "\"Go back, step by step, until you find it,\" Mom said."] },
+            { image: "assets/image-049.jpg", pageNo: 6, sentences: ["\"Have you seen my shadow?\"", "Gus asked Grace.", "\"Try looking where you left it,\" Grace said."] },
+            { image: "assets/image-050.jpg", pageNo: 7, sentences: ["Gus stopped looking.", "He began to shout:", "\"HAS ANYBODY SEEN MY SHADOW?\""] },
+            { image: "assets/image-051.jpg", pageNo: 8, sentences: ["\"Have you tried looking outside?\" asked Dad.", "Gus hadn't been outside in months.", "He hadn't seen his shadow in months.", "Maybe his shadow was outside!"] },
+            { image: "assets/image-052.jpg", pageNo: 9, sentences: ["Gus left the burrow and went outside.", "As soon as he did, someone began to cheer.", "Children waved and jumped up and down.", "People shot photos of him.", "They all looked really happy."] },
+            { image: "assets/image-053.jpg", pageNo: 10, sentences: ["Gus forgot about his shadow.", "Gus was a star!"] },
+            { image: "assets/image-054.jpg", pageNo: 11, sentences: ["Back in the burrow, his family gathered around him.", "Gus grinned from ear to ear.", "\"Did you find it?\" asked Mom."] },
+            { image: "assets/image-055.jpg", pageNo: 12, sentences: ["\"Find what?\" asked Gus."] }
+          ],
+          words: [
+            { "word": "worried", "meaningZh": "担心的", "split": ["wor", "ried"], "ipa": "/ˈwʌr.id/", "phonicsNote": "wor 发 /wɜː/；-ied 发 /id/", "example": "Gus was worried." },
+            { "word": "shadow", "meaningZh": "影子", "split": ["shad", "ow"], "ipa": "/ˈʃæd.oʊ/", "phonicsNote": "sh 发 /ʃ/；ow 发 /oʊ/", "example": "He couldn't find his shadow anywhere." },
+            { "word": "burrow", "meaningZh": "地洞；洞穴", "split": ["bur", "row"], "ipa": "/ˈbɜːr.oʊ/", "phonicsNote": "ur 发 /ɜː/；ow 发 /oʊ/", "example": "Back in the burrow, his family gathered around him." },
+            { "word": "grinned", "meaningZh": "咧嘴笑（grin 的过去式）", "split": ["grin", "ned"], "ipa": "/ɡrɪnd/", "phonicsNote": "gr 两个音连读；nned 发 /nd/", "example": "Gus grinned from ear to ear." },
+            { "word": "cheer", "meaningZh": "欢呼", "split": ["cheer"], "ipa": "/tʃɪr/", "phonicsNote": "ch 发 /tʃ/；eer 发 /ɪr/", "example": "As soon as he did, someone began to cheer." }
+          ],
+          quiz: [
+            { "type": "detail", "question": "What was Gus worried about at the beginning of the story?", "options": ["He could not find his shadow.", "He could not find his mom.", "He could not find his hat."], "answer": 0 },
+            { "type": "detail", "question": "Who told Gus to go back, step by step, until he found his shadow?", "options": ["Dad", "Mom", "Grace"], "answer": 1 },
+            { "type": "detail", "question": "What did the children do when Gus went outside?", "options": ["They waved and jumped up and down.", "They ran back into the burrow.", "They hid behind the trees."], "answer": 0 },
+            { "type": "inference", "question": "Why hadn't Gus seen his shadow in months?", "options": ["He had been sleeping all winter.", "He hadn't been outside in months.", "His shadow was hiding from him."], "answer": 1 },
+            { "type": "evidence", "question": "Which sentence tells us that Gus forgot all about his shadow at the end?", "options": ["Gus grinned from ear to ear.", "Gus forgot about his shadow.", "Gus stopped looking."], "answer": 1 }
+          ],
+          oralQuestions: ["Retell the story: why was Gus worried, who did he ask for help, and what happened at the end?", "Do you think Gus was happy at the end? Tell me your reasons."]
+        },
+        {
+          id: "dogs-at-work", title: "Dogs at Work", author: "Kathie Lester", level: "G",
+          cover: "assets/image-056.jpg",
+          pages: [
+            { image: "assets/image-057.jpg", pageNo: 3, sentences: ["Table of Contents", "Introduction", "Dogs That Help People", "Some Dogs Work Outdoors", "Some Work Is Strange", "Dogs Help Keep Us Safe", "Conclusion"] },
+            { image: "assets/image-058.jpg", pageNo: 4, sentences: [] },
+            { image: "assets/image-059.jpg", pageNo: 5, sentences: ["Introduction", "Dogs are friendly and smart.", "Dogs have natural senses.", "Dogs' senses help them smell, see, and hear things.", "Dogs are good at doing many things that help people.", "Dogs can learn to do special types of work."] },
+            { image: "assets/image-060.jpg", pageNo: 6, sentences: ["Dogs That Help People", "Some people can't hear.", "A dog can listen for sounds.", "Some people can't see.", "A dog helps them walk safely."] },
+            { image: "assets/image-061.jpg", pageNo: 7, sentences: ["Some people can't move.", "A dog can get things for them.", "Some people feel sad.", "A dog can make them smile."] },
+            { image: "assets/image-062.jpg", pageNo: 8, sentences: ["Some Dogs Work Outdoors", "A dog can bring home sheep that get lost.", "A dog can help a hunter find wild birds."] },
+            { image: "assets/image-063.jpg", pageNo: 9, sentences: ["Some Work Is Strange", "A dog can chase geese away from airports.", "A dog can smell insects that harm buildings."] },
+            { image: "assets/image-064.jpg", pageNo: 10, sentences: ["Dogs Help Keep Us Safe", "A dog can help the police solve a crime.", "A dog can help find out how a fire started."] },
+            { image: "assets/image-065.jpg", pageNo: 11, sentences: ["A dog can sniff to find out where drugs are hidden.", "A dog can jump in the water to help a swimmer.", "A dog can search for people who are lost or hurt."] },
+            { image: "assets/image-066.jpg", pageNo: 12, sentences: ["Conclusion", "Dogs can learn many jobs that help people.", "A dog's best work is to be a friend!"] }
+          ],
+          words: [
+            { "word": "senses", "meaningZh": "感官", "split": ["sens", "es"], "ipa": "/ˈsen.sɪz/", "phonicsNote": "ses 发 /sɪz/", "example": "Dogs have natural senses." },
+            { "word": "natural", "meaningZh": "天生的", "split": ["nat", "u", "ral"], "ipa": "/ˈnætʃ.ər.əl/", "phonicsNote": "tur 发 /tʃər/", "example": "Dogs have natural senses." },
+            { "word": "sniff", "meaningZh": "嗅闻", "split": ["sniff"], "ipa": "/snɪf/", "phonicsNote": "sn 两个音连读；ff 发 /f/", "example": "A dog can sniff to find out where drugs are hidden." },
+            { "word": "swimmer", "meaningZh": "游泳的人", "split": ["swim", "mer"], "ipa": "/ˈswɪm.ər/", "phonicsNote": "sw 两个音连读；mmer 发 /mər/", "example": "A dog can jump in the water to help a swimmer." },
+            { "word": "hunter", "meaningZh": "猎人", "split": ["hunt", "er"], "ipa": "/ˈhʌn.tər/", "phonicsNote": "un 发 /ʌn/；ter 发 /tər/", "example": "A dog can help a hunter find wild birds." }
+          ],
+          quiz: [
+            { "type": "detail", "question": "What helps dogs smell, see, and hear things?", "options": ["Their natural senses", "Their big teeth", "Their warm fur"], "answer": 0 },
+            { "type": "detail", "question": "How does a dog help people who can't hear?", "options": ["It walks them across the street.", "It listens for sounds for them.", "It chases geese for them."], "answer": 1 },
+            { "type": "detail", "question": "What strange job does a dog do at airports?", "options": ["It chases geese away.", "It jumps in the water.", "It brings home sheep."], "answer": 0 },
+            { "type": "inference", "question": "Why can dogs learn to do special types of work?", "options": ["They are friendly, smart, and have good senses.", "They are bigger than other pets.", "They like to live outside."], "answer": 0 },
+            { "type": "evidence", "question": "Which sentence tells us what a dog's best work is?", "options": ["Dogs are friendly and smart.", "A dog can help the police solve a crime.", "A dog's best work is to be a friend!"], "answer": 2 }
+          ],
+          oralQuestions: ["The book talks about many jobs dogs can do. Retell three of them.", "What other jobs do you think dogs could learn to do? Give your reasons."]
+        },
+        {
+          id: "beanie-and-the-missing-bear", title: "Beanie and the Missing Bear", author: "Dori H. Butler", level: "G",
+          cover: "assets/image-067.jpg",
+          pages: [
+            { image: "assets/image-068.jpg", pageNo: 3, sentences: ["My name is Beanie.", "I am a detective.", "That means I solve mysteries."] },
+            { image: "assets/image-069.jpg", pageNo: 4, sentences: ["I have my first mystery to solve.", "My sister Clare can't find her bear."] },
+            { image: "assets/image-070.jpg", pageNo: 5, sentences: ["Clare points at Dad's chair.", "“I left my bear in that chair,” says Clare."] },
+            { image: "assets/image-071.jpg", pageNo: 6, sentences: ["I look on the chair, under the chair, and behind the chair.", "No bear."] },
+            { image: "assets/image-072.jpg", pageNo: 7, sentences: ["Did you see that?", "Our dog Chomps took that sock.", "Maybe he took Clare's bear, too."] },
+            { image: "assets/image-073.jpg", pageNo: 8, sentences: ["I follow Chomps.", "I look in Chomps's bed.", "I see a sock, a ball, and Danny's rabbit.", "But no bear."] },
+            { image: "assets/image-074.jpg", pageNo: 9, sentences: ["I give Danny his rabbit.", "He puts it in a new blanket.", "What about Danny's old blanket?"] },
+            { image: "assets/image-075.jpg", pageNo: 10, sentences: ["There is something strange about Danny's old blanket.", "Do you see it, too?", "“Please, Danny,” I say.", "“May I look at your old blanket?”"] },
+            { image: "assets/image-076.jpg", pageNo: 11, sentences: ["I open the old blanket.", "“Hello, Bear!” I say.", "Chomps did not take the bear.", "It was Danny.", "I solved the mystery."] },
+            { image: "assets/image-077.jpg", pageNo: 12, sentences: ["Now Clare thinks I'm the best detective in the world.", "She could be right."] }
+          ],
+          words: [
+            { "word": "detective", "meaningZh": "侦探", "split": ["de", "tec", "tive"], "ipa": "/dɪˈtektɪv/", "phonicsNote": "三个音节，重音在第二个 tec 上；tive 读 /ˈtektɪv/", "example": "I am a detective." },
+            { "word": "mystery", "meaningZh": "谜团", "split": ["mys", "ter", "y"], "ipa": "/ˈmɪstəri/", "phonicsNote": "y 发 /ɪ/；重音在第一个 mys 上", "example": "That means I solve mysteries." },
+            { "word": "follow", "meaningZh": "跟随", "split": ["fol", "low"], "ipa": "/ˈfɑːloʊ/", "phonicsNote": "ow 在这里发 /oʊ/ 的音", "example": "I follow Chomps." },
+            { "word": "strange", "meaningZh": "奇怪的", "split": ["str", "ange"], "ipa": "/streɪndʒ/", "phonicsNote": "str 三个音连读；a_e 发 /eɪ/；ge 发 /dʒ/", "example": "There is something strange about Danny's old blanket." },
+            { "word": "solve", "meaningZh": "解开（谜）", "split": ["s", "ol", "ve"], "ipa": "/sɑːlv/", "phonicsNote": "o_e 发长音 /oʊ/；e 不发音", "example": "I solved the mystery." }
+          ],
+          quiz: [
+            { "type": "detail", "question": "Who can't find her bear?", "options": ["Clare", "Danny", "Emmy"], "answer": 0 },
+            { "type": "detail", "question": "Where did Beanie look for the bear?", "options": ["On the chair, under the chair, and behind the chair", "In Danny's new blanket", "In the dog's house"], "answer": 0 },
+            { "type": "detail", "question": "What did Beanie see in Chomps's bed?", "options": ["A sock, a ball, and Danny's rabbit", "Clare's bear", "A sock and a blanket"], "answer": 0 },
+            { "type": "inference", "question": "Why did Beanie think Chomps took Clare's bear?", "options": ["She saw Chomps take a sock, so she guessed he took the bear, too", "Clare told her Chomps did it", "Danny told her Chomps did it"], "answer": 0 },
+            { "type": "evidence", "question": "Which sentence tells us who really took the bear?", "options": ["Chomps did not take the bear.", "It was Danny.", "She could be right."], "answer": 1 }
+          ],
+          oralQuestions: ["Tell what Beanie did, in order, to solve the mystery of the missing bear.", "Danny took Clare's bear and hid it in his blanket. What do you think of that? Tell why."]
+        },
+        {
+          id: "billy-gets-lost", title: "Billy Gets Lost", author: "Francis Morgan", level: "G",
+          cover: "assets/image-078.jpg",
+          pages: [
+            { image: "assets/image-079.jpg", pageNo: 3, sentences: ["Billy is a puppy.", "He lives in a big house with a blue roof.", "He loves to play fetch with Emmy."] },
+            { image: "assets/image-080.jpg", pageNo: 4, sentences: ["Emmy throws the ball.", "Billy chases it.", "Then, Billy sees Cat.", "He drops the ball and chases Cat."] },
+            { image: "assets/image-081.jpg", pageNo: 5, sentences: ["Cat runs down the street, and Billy chases him.", "Emmy cries, “Come back, Billy.”", "Cat runs through a farm, and Billy chases him.", "Cat runs into the forest, and Billy chases him."] },
+            { image: "assets/image-082.jpg", pageNo: 6, sentences: ["Cat climbs up a tree.", "Billy turns to go home.", "He cannot see the big house with a blue roof.", "“Oh, no, I am lost,” Billy says."] },
+            { image: "assets/image-083.jpg", pageNo: 7, sentences: ["Billy runs down a path.", "He sees Fox.", "“How can I get home?” he asks Fox."] },
+            { image: "assets/image-084.jpg", pageNo: 8, sentences: ["“I have never been out of the forest,” says Fox.", "“Ask Cow in the farmer's field,” Fox says.", "Billy runs to the farmer's field."] },
+            { image: "assets/image-085.jpg", pageNo: 9, sentences: ["Billy says to Cow, “I am lost.”", "“Do you know the way to my house?” Billy asks.", "“I have never been off the farm,” says Cow.", "“Ask Owl,” Cow says."] },
+            { image: "assets/image-086.jpg", pageNo: 10, sentences: ["Billy goes to Owl in the barn.", "“Please wake up, Owl,” says Billy.", "“I need your help,” he says.", "“I am lost!” he cries."] },
+            { image: "assets/image-087.jpg", pageNo: 11, sentences: ["“Do you know a big house with a blue roof?” Billy asks.", "“Yes, I do,” Owl says.", "Owl flies, and Billy chases her."] },
+            { image: "assets/image-088.jpg", pageNo: 12, sentences: ["Then, Billy sees Emmy at the big house with a blue roof.", "“Thank you, Owl,” says Billy."] }
+          ],
+          words: [
+            { "word": "puppy", "meaningZh": "小狗", "split": ["pup", "py"], "ipa": "/ˈpʌpi/", "phonicsNote": "u 在这里发短音 /ʌ/；y 读 /ɪ/", "example": "Billy is a puppy." },
+            { "word": "chase", "meaningZh": "追", "split": ["ch", "a", "se"], "ipa": "/tʃeɪs/", "phonicsNote": "ch 发 /tʃ/；a_e 发 /eɪ/；e 不发音", "example": "Billy chases it." },
+            { "word": "lost", "meaningZh": "迷路的", "split": ["l", "o", "s", "t"], "ipa": "/lɔːst/", "phonicsNote": "o 发 /oː/，嘴型是长音 o", "example": "“Oh, no, I am lost,” Billy says." },
+            { "word": "forest", "meaningZh": "森林", "split": ["for", "est"], "ipa": "/ˈfɔːrɪst/", "phonicsNote": "or 发 /ɔːr/；重音在第一个 for 上", "example": "Cat runs into the forest, and Billy chases him." },
+            { "word": "farmer", "meaningZh": "农民", "split": ["farm", "er"], "ipa": "/ˈfɑːrmər/", "phonicsNote": "ar 发 /aːr/；er 在这里发弱读 /ər/", "example": "Billy runs to the farmer's field." }
+          ],
+          quiz: [
+            { "type": "detail", "question": "What is Billy?", "options": ["A puppy", "A cat", "A fox"], "answer": 0 },
+            { "type": "detail", "question": "Why does Billy get lost?", "options": ["He chases Cat far away and cannot see his house", "He plays fetch with Emmy", "He goes to sleep in the barn"], "answer": 0 },
+            { "type": "detail", "question": "Fox cannot help Billy. Where does Fox tell him to go?", "options": ["To Cow in the farmer's field", "To Emmy at home", "To Cat up the tree"], "answer": 0 },
+            { "type": "inference", "question": "Owl flies, and Billy chases her. How does this help Billy get home?", "options": ["Billy follows Owl, and she leads him back to the big house with a blue roof", "Owl carries Billy home on her back", "Owl calls Emmy to come and find Billy"], "answer": 0 },
+            { "type": "evidence", "question": "Which sentence tells us Billy is lost?", "options": ["“Oh, no, I am lost,” Billy says.", "Billy turns to go home.", "Cat climbs up a tree."], "answer": 0 }
+          ],
+          oralQuestions: ["Tell the story of how Billy got lost and found his way home, in order.", "Should Billy chase Cat? What do you think? Tell why."]
+        },
+        {
+          id: "bonks-bad-dream", title: "Bonk's Bad Dream", author: "Maribeth Boelts", level: "G",
+          cover: "assets/image-089.jpg",
+          pages: [
+            { image: "assets/image-090.jpg", pageNo: 3, sentences: ["Bonk gets ready for bed.", "\"I hope I have a good dream,\" he says."] },
+            { image: "assets/image-091.jpg", pageNo: 4, sentences: ["In the night, Bonk has a bad dream.", "He dreams about a T-Rex."] },
+            { image: "assets/image-092.jpg", pageNo: 5, sentences: ["Bonk goes over to Snag's house.", "\"It is the middle of the night,\" says Snag."] },
+            { image: "assets/image-093.jpg", pageNo: 6, sentences: ["\"I had a bad dream about a T-Rex,\" says Bonk.", "\"That's too bad,\" says Snag.", "Bonk and Snag play checkers."] },
+            { image: "assets/image-094.jpg", pageNo: 7, sentences: ["Soon, Bonk is yawning.", "Snag makes a bed for Bonk."] },
+            { image: "assets/image-095.jpg", pageNo: 8, sentences: ["Bonk dreams about T-Rex again.", "This time, T-Rex is under Snag's bed.", "The T-Rex reaches for Bonk.", "Bonk wakes up Snag.", "\"I had another bad dream,\" Bonk says."] },
+            { image: "assets/image-096.jpg", pageNo: 9, sentences: ["\"Did you watch a scary T-Rex movie?\" asks Snag.", "Bonk nods yes.", "\"I have an idea,\" says Snag."] },
+            { image: "assets/image-097.jpg", pageNo: 10, sentences: ["Bonk and Snag watch a happy T-Rex movie.", "\"This is silly,\" says Bonk.", "\"T-Rex does not pick daisies.\""] },
+            { image: "assets/image-098.jpg", pageNo: 11, sentences: ["The next day, Bonk and Snag go to the toy store.", "Snag buys Bonk a stuffed T-Rex.", "\"This T-Rex isn't scary,\" says Snag."] },
+            { image: "assets/image-099.jpg", pageNo: 12, sentences: ["That night, Bonk hugs his new T-Rex tight.", "He falls asleep thinking about a happy T-Rex picking daisies.", "Bonk has sweet dreams all night long!"] }
+          ],
+          words: [
+            { "word": "dream", "meaningZh": "梦（做梦）", "split": ["dr", "ea", "m"], "ipa": "/driːm/", "phonicsNote": "ea 发长音 /iː/", "example": "In the night, Bonk has a bad dream." },
+            { "word": "yawn", "meaningZh": "打哈欠", "split": ["y", "aw", "n"], "ipa": "/jɔːn/", "phonicsNote": "aw 发 /ɔː/，嘴巴张圆", "example": "Soon, Bonk is yawning." },
+            { "word": "silly", "meaningZh": "傻傻的，滑稽的", "split": ["s", "i", "ll", "y"], "ipa": "/ˈsɪli/", "phonicsNote": "词尾的 y 发 /i/", "example": "\"This is silly,\" says Bonk." },
+            { "word": "tight", "meaningZh": "紧紧地", "split": ["t", "igh", "t"], "ipa": "/taɪt/", "phonicsNote": "igh 发 /aɪ/，gh 不发音", "example": "That night, Bonk hugs his new T-Rex tight." },
+            { "word": "stuffed", "meaningZh": "填充的，毛绒的", "split": ["st", "u", "ff", "ed"], "ipa": "/stʌft/", "phonicsNote": "st 连读；ed 在 t 后面发 /t/", "example": "Snag buys Bonk a stuffed T-Rex." }
+          ],
+          quiz: [
+            { "type": "detail", "question": "What does Bonk dream about in the night?", "options": ["A T-Rex", "A checkers game", "A toy store"], "answer": 0 },
+            { "type": "detail", "question": "Where is the T-Rex in Bonk's second bad dream?", "options": ["In the toy store", "Under Snag's bed", "On the TV"], "answer": 1 },
+            { "type": "detail", "question": "What does Snag buy for Bonk at the toy store?", "options": ["A checker game", "A happy movie", "A stuffed T-Rex"], "answer": 2 },
+            { "type": "inference", "question": "At the end, why does Bonk have sweet dreams instead of bad dreams?", "options": ["He falls asleep thinking about a happy T-Rex picking daisies", "He stays awake all night", "He goes back to his own house"], "answer": 0 },
+            { "type": "evidence", "question": "Which sentence tells us what Snag says when Bonk comes to his house in the middle of the night?", "options": ["Bonk goes over to Snag's house.", "\"It is the middle of the night,\" says Snag.", "Bonk and Snag play checkers."], "answer": 1 }
+          ],
+          oralQuestions: ["Retell the story: What happens to Bonk from the beginning to the end?", "Snag helps Bonk feel better about the T-Rex. What would you do to help a friend who had a bad dream? Tell me why."]
+        },
+        {
+          id: "bonks-loose-tooth", title: "Bonk's Loose Tooth", author: "Maribeth Boelts", level: "G",
+          cover: "assets/image-100.jpg",
+          pages: [
+            { image: "assets/image-101.jpg", pageNo: 3, sentences: ["Bonk has a loose tooth.", "He wiggles it night and day.", "\"I am lucky. I have a loose tooth,\" he says.", "\"I am growing up,\" he says."] },
+            { image: "assets/image-102.jpg", pageNo: 4, sentences: ["Jupe, Lurk, and Snag check their teeth.", "They push and pull.", "No teeth are loose."] },
+            { image: "assets/image-103.jpg", pageNo: 5, sentences: ["\"That is too bad,\" says Bonk.", "Bonk makes a paper crown.", "\"I am the king of loose teeth,\" says Bonk.", "\"Watch me wiggle,\" he says."] },
+            { image: "assets/image-104.jpg", pageNo: 6, sentences: ["Lurk makes up a story.", "\"Once there was a monster.", "He lost all his teeth.", "He could not chew.", "He never had teeth again.", "The End.\""] },
+            { image: "assets/image-105.jpg", pageNo: 7, sentences: ["\"I do not like that story,\" says Bonk.", "Snag makes up a story.", "\"Once there was a monster.", "His teeth got pulled out.", "It hurt.", "The End.\""] },
+            { image: "assets/image-106.jpg", pageNo: 8, sentences: ["Bonk takes off his crown.", "He stops wiggling his tooth.", "\"I do not want my tooth to come out!\" he says."] },
+            { image: "assets/image-107.jpg", pageNo: 9, sentences: ["But Bonk's tooth gets looser.", "Jupe holds his hand.", "\"I know a story,\" says Jupe."] },
+            { image: "assets/image-108.jpg", pageNo: 10, sentences: ["\"Once there was a monster.", "His tooth fell out.", "He put it under his pillow.", "The Tooth Monster came.", "She took his tooth and left a present.", "The monster was happy.", "The End.\""] },
+            { image: "assets/image-109.jpg", pageNo: 11, sentences: ["\"I like that story,\" says Bonk.", "\"Is it true?\"", "\"It is true,\" says Jupe."] },
+            { image: "assets/image-110.jpg", pageNo: 12, sentences: ["\"We are sorry,\" say Lurk and Snag.", "\"I am sorry, too,\" says Bonk."] },
+            { image: "assets/image-111.jpg", pageNo: 13, sentences: ["Bonk's tooth gets looser and looser.", "Pop! His tooth is out!", "Jupe, Lurk, and Snag cheer.", "They have a party."] },
+            { image: "assets/image-112.jpg", pageNo: 14, sentences: ["\"Is this party for me?\" asks Bonk.", "Jupe smiles.", "\"It is for you and for me,\" says Jupe.", "\"I have a loose tooth, too!\""] }
+          ],
+          words: [
+            { "word": "loose", "meaningZh": "松动的", "split": ["l", "oo", "se"], "ipa": "/luːs/", "phonicsNote": "oo 发长音 /uː/；这里的 s 发 /s/", "example": "Bonk has a loose tooth." },
+            { "word": "wiggle", "meaningZh": "扭动，摇晃", "split": ["wig", "gle"], "ipa": "/ˈwɪɡəl/", "phonicsNote": "重音在第一个音节 wig 上", "example": "He wiggles it night and day." },
+            { "word": "chew", "meaningZh": "咀嚼", "split": ["ch", "ew"], "ipa": "/tʃuː/", "phonicsNote": "ch 发 /tʃ/；ew 发 /uː/", "example": "He could not chew." },
+            { "word": "pillow", "meaningZh": "枕头", "split": ["pil", "low"], "ipa": "/ˈpɪloʊ/", "phonicsNote": "词尾的 ow 发 /oʊ/", "example": "He put it under his pillow." },
+            { "word": "cheer", "meaningZh": "欢呼", "split": ["ch", "eer"], "ipa": "/tʃɪr/", "phonicsNote": "eer 发 /ɪr/", "example": "Jupe, Lurk, and Snag cheer." }
+          ],
+          quiz: [
+            { "type": "detail", "question": "Who has a loose tooth at the beginning of the story?", "options": ["Bonk", "Jupe", "Lurk"], "answer": 0 },
+            { "type": "detail", "question": "What does Bonk make and wear when he calls himself the king of loose teeth?", "options": ["A paper crown", "A tooth pillow", "A party hat"], "answer": 0 },
+            { "type": "detail", "question": "In Jupe's story, what does the Tooth Monster do?", "options": ["She pulls the tooth out", "She takes the tooth and leaves a present", "She scares the monster"], "answer": 1 },
+            { "type": "inference", "question": "Why does Bonk say he does not want his tooth to come out?", "options": ["The tooth hurts too much", "The scary stories make him afraid", "He wants to stay little"], "answer": 1 },
+            { "type": "evidence", "question": "Which sentence tells us that none of the friends' teeth are loose?", "options": ["Jupe, Lurk, and Snag check their teeth.", "They push and pull.", "No teeth are loose."], "answer": 2 }
+          ],
+          oralQuestions: ["Retell the story: What stories do the friends tell, and how does Bonk feel about each one?", "At the end, Jupe says the Tooth Monster story is true. Do you believe her? Tell me why."]
+        },
+        {
+          id: "carlos-joins-the-team", title: "Carlos Joins the Team", author: "Lorena F. Di Bello", level: "G",
+          cover: "assets/image-113.jpg",
+          pages: [
+            { image: "assets/image-114.jpg", pageNo: 3, sentences: ["Carlos likes to play baseball.", "He plays catch with his little sister, Selena."] },
+            { image: "assets/image-115.jpg", pageNo: 4, sentences: ["The baseball coach asks Carlos to join his team.", "\"I'm so new in this school.", "I don't know the kids here,\" says Carlos."] },
+            { image: "assets/image-116.jpg", pageNo: 5, sentences: ["\"Playing sports can help you make new friends,\" says the coach.", "\"Then I will join the team!\" says Carlos."] },
+            { image: "assets/image-117.jpg", pageNo: 6, sentences: ["Carlos wears his baseball glove to bed the night before his first game.", "The glove is still on his hand when he wakes up."] },
+            { image: "assets/image-118.jpg", pageNo: 7, sentences: ["At school, a girl named Becky gives Carlos a card.", "The card asks him to come to her birthday party."] },
+            { image: "assets/image-119.jpg", pageNo: 8, sentences: ["\"Oh, no!\" Carlos says.", "\"We have a big game that day.", "Maybe I can come to your party instead.\""] },
+            { image: "assets/image-120.jpg", pageNo: 9, sentences: ["Carlos asks the coach if he can miss the big game.", "\"If you don't come,\" the coach says, \"your team will be missing a player.\""] },
+            { image: "assets/image-121.jpg", pageNo: 10, sentences: ["\"I should not miss the game,\" Carlos says.", "\"The team will need me.\""] },
+            { image: "assets/image-122.jpg", pageNo: 11, sentences: ["On the day of the big game all of the families come to watch."] },
+            { image: "assets/image-123.jpg", pageNo: 12, sentences: ["Carlos helps the team win.", "Becky brings cake for the team!", "Everybody wins!"] }
+          ],
+          words: [
+            { "word": "coach", "meaningZh": "教练", "split": ["c", "oa", "ch"], "ipa": "/koʊtʃ/", "phonicsNote": "oa 发 /oʊ/；ch 发 /tʃ/", "example": "The baseball coach asks Carlos to join his team." },
+            { "word": "instead", "meaningZh": "代替，反而", "split": ["in", "stead"], "ipa": "/ɪnˈsted/", "phonicsNote": "重音在 stead 上；ea 在这里发 /e/", "example": "Maybe I can come to your party instead." },
+            { "word": "missing", "meaningZh": "缺少的", "split": ["m", "i", "ss", "ing"], "ipa": "/ˈmɪsɪŋ/", "phonicsNote": "ing 发 /ɪŋ/，g 不发音", "example": "\"If you don't come,\" the coach says, \"your team will be missing a player.\"" },
+            { "word": "glove", "meaningZh": "手套", "split": ["g", "l", "ove"], "ipa": "/ɡlʌv/", "phonicsNote": "o 在这里发 /ʌ/ 的短音", "example": "Carlos wears his baseball glove to bed the night before his first game." },
+            { "word": "win", "meaningZh": "获胜", "split": ["w", "i", "n"], "ipa": "/wɪn/", "phonicsNote": "i 发短音 /ɪ/", "example": "Carlos helps the team win." }
+          ],
+          quiz: [
+            { "type": "detail", "question": "Who does Carlos play catch with?", "options": ["His little sister, Selena", "The baseball coach", "Becky"], "answer": 0 },
+            { "type": "detail", "question": "What does Becky give to Carlos at school?", "options": ["A baseball glove", "A card for her birthday party", "A piece of cake"], "answer": 1 },
+            { "type": "detail", "question": "What does the coach say if Carlos does not come to the big game?", "options": ["The team will be missing a player", "The game will be canceled", "Becky will be sad"], "answer": 0 },
+            { "type": "inference", "question": "Carlos wears his baseball glove to bed the night before the game. What does this tell us about how he feels?", "options": ["He is excited about the game", "He lost his pajamas", "He is afraid of the dark"], "answer": 0 },
+            { "type": "evidence", "question": "Which sentence tells us why the coach thinks Carlos should join the team?", "options": ["The baseball coach asks Carlos to join his team.", "\"Playing sports can help you make new friends,\" says the coach.", "\"Then I will join the team!\" says Carlos."], "answer": 1 }
+          ],
+          oralQuestions: ["Retell the story: Carlos has a problem — a big game and a birthday party on the same day. What does he decide, and how does the story end?", "The coach says playing sports can help Carlos make new friends. Do you agree? Tell me why."]
+        },
+        {
+          id: "i-bet-i-can", title: "I Bet I Can", author: "Veronica Angel", level: "G",
+          cover: "assets/image-124.jpg",
+          pages: [
+            { image: "assets/image-125.jpg", pageNo: 3, sentences: ["I bet I can jump over the river, said the bear.", "I bet you can't, said the kangaroo."] },
+            { image: "assets/image-126.jpg", pageNo: 4, sentences: ["So the bear ran to the river.", "He jumped.", "SPLASH, went the bear.", "He did not jump over the river."] },
+            { image: "assets/image-127.jpg", pageNo: 5, sentences: ["I bet I can jump over that tall wall, said the bear.", "I bet you can't, said the goat."] },
+            { image: "assets/image-128.jpg", pageNo: 6, sentences: ["So the bear ran toward the tall wall.", "He jumped.", "SPLAT, went the bear.", "He did not jump over the tall wall."] },
+            { image: "assets/image-129.jpg", pageNo: 7, sentences: ["I bet I can swing on the rope, said the bear.", "I bet you can't, said the fox."] },
+            { image: "assets/image-130.jpg", pageNo: 8, sentences: ["So the bear grabbed the rope, ran, and jumped.", "SNAP, went the rope.", "Down went the bear.", "He did not swing on the rope."] },
+            { image: "assets/image-131.jpg", pageNo: 9, sentences: ["I bet I can sleep all winter, said the bear.", "I bet you can't, said the hawk."] },
+            { image: "assets/image-132.jpg", pageNo: 10, sentences: ["So the bear went into a cave.", "He curled up into a big ball.", "ZZZZZZZZZZZ, went the bear.", "And he did sleep all winter."] }
+          ],
+          words: [
+            { "word": "bet", "meaningZh": "打赌", "split": ["b", "e", "t"], "ipa": "/bet/", "phonicsNote": "短元音 e，发 /e/ 的音", "example": "I bet I can jump over the river, said the bear." },
+            { "word": "kangaroo", "meaningZh": "袋鼠", "split": ["kan", "ga", "roo"], "ipa": "/ˌkæŋɡəˈruː/", "phonicsNote": "三个音节，重音在第三个 roo 上；oo 发 /uː/", "example": "I bet you can't, said the kangaroo." },
+            { "word": "splash", "meaningZh": "扑通一声（落水声）", "split": ["spl", "a", "sh"], "ipa": "/splæʃ/", "phonicsNote": "spl 三个音连读；sh 发 /ʃ/", "example": "SPLASH, went the bear." },
+            { "word": "curled", "meaningZh": "蜷缩起来的", "split": ["curl", "ed"], "ipa": "/kɜːrld/", "phonicsNote": "ed 在这里跟前面连读，发 /d/ 的音", "example": "He curled up into a big ball." },
+            { "word": "snap", "meaningZh": "啪的一声（断裂声）", "split": ["s", "n", "a", "p"], "ipa": "/snæp/", "phonicsNote": "sn 两个音连读，不要分开", "example": "SNAP, went the rope." }
+          ],
+          quiz: [
+            { "type": "detail", "question": "What did the bear bet he could do first?", "options": ["Jump over the river", "Jump over the tall wall", "Swing on the rope"], "answer": 0 },
+            { "type": "detail", "question": "What happened when the bear jumped at the tall wall?", "options": ["He jumped over it.", "He went SPLAT against it.", "He went SPLASH into the river."], "answer": 1 },
+            { "type": "detail", "question": "What happened to the rope when the bear tried to swing on it?", "options": ["It stayed tied.", "It fell into the river.", "It snapped."], "answer": 2 },
+            { "type": "inference", "question": "Which bet did the bear WIN?", "options": ["Jump over the river", "Swing on the rope", "Sleep all winter"], "answer": 2 },
+            { "type": "evidence", "question": "Which sentence tells us the bear did NOT get over the tall wall?", "options": ["So the bear ran toward the tall wall.", "He jumped.", "He did not jump over the tall wall."], "answer": 2 }
+          ],
+          oralQuestions: ["Tell the story of the bear's four bets: what did he try each time, and which bet did he win?", "Do you think the bear was smart to make these bets? Why or why not?"]
+        },
+        {
+          id: "grow-tomatoes-in-six-steps", title: "Grow Tomatoes in Six Steps", author: "Alyse Sweeney", level: "G",
+          cover: "assets/image-133.jpg",
+          pages: [
+            { image: "assets/image-134.jpg", pageNo: 3, sentences: ["Tasty Tomatoes 4", "Step 1: Plant the Seeds 5", "Step 2: Water the Seeds 6", "Step 3: See the Seedling 7", "Step 4: Time to Transplant 8", "Step 5: Water the Seedling 9", "Step 6: Stake the Plant 10", "Pick the Tomatoes! 11"] },
+            { image: "assets/image-135.jpg", pageNo: 4, sentences: ["Tasty Tomatoes", "Do you like tomatoes?", "I think they're tasty!", "They are fun and easy to grow, too!"] },
+            { image: "assets/image-136.jpg", pageNo: 5, sentences: ["Step 1: Plant the Seeds", "Fill a small pot with soil.", "Use a pencil to poke a hole halfway down the soil.", "Drop two seeds in the hole.", "Fill the hole with soil."] },
+            { image: "assets/image-137.jpg", pageNo: 6, sentences: ["Step 2: Water the Seeds", "Water the seeds, but not too much."] },
+            { image: "assets/image-138.jpg", pageNo: 7, sentences: ["Step 3: See the Seedling", "Each day, make sure that the soil is a little wet.", "In about a week, you'll see a seedling poke out of the soil!", "Move the pot to a warm, sunny place."] },
+            { image: "assets/image-139.jpg", pageNo: 8, sentences: ["Step 4: Time to Transplant", "Soon the seedling will be a few inches high.", "It's time to plant the seedling outside.", "Dig a deep hole, and put the seedling inside."] },
+            { image: "assets/image-140.jpg", pageNo: 9, sentences: ["Step 5: Water the Seedling", "Put water in the hole.", "Fill the hole with soil.", "Pat the soil."] },
+            { image: "assets/image-141.jpg", pageNo: 10, sentences: ["Step 6: Stake the Plant", "As your tomato plant grows, tie the plant to a stake.", "Flowers will bloom on the plant before the tomatoes will grow."] },
+            { image: "assets/image-142.jpg", pageNo: 11, sentences: ["Pick the Tomatoes!", "When is it time to taste your tomatoes?", "When they turn red!"] },
+            { image: "assets/image-143.jpg", pageNo: 12, sentences: ["I like to make fresh tomato salad.", "How do you like to eat tomatoes?"] }
+          ],
+          words: [
+            { "word": "tasty", "meaningZh": "美味的", "split": ["tast", "y"], "ipa": "/ˈteɪsti/", "phonicsNote": "a 发 /eɪ/；结尾 y 发 /i/", "example": "I think they're tasty!" },
+            { "word": "soil", "meaningZh": "土壤", "split": ["s", "oi", "l"], "ipa": "/sɔɪl/", "phonicsNote": "oi 发 /ɔɪ/，嘴型从 o 滑到 i", "example": "Fill a small pot with soil." },
+            { "word": "seedling", "meaningZh": "幼苗", "split": ["seed", "ling"], "ipa": "/ˈsiːdlɪŋ/", "phonicsNote": "ee 发 /iː/；ng 发 /ŋ/", "example": "In about a week, you'll see a seedling poke out of the soil!" },
+            { "word": "transplant", "meaningZh": "移栽", "split": ["trans", "plant"], "ipa": "/trænsˈplænt/", "phonicsNote": "trans + plant 合起来；重音在 plant 上", "example": "Step 4: Time to Transplant" },
+            { "word": "bloom", "meaningZh": "开花", "split": ["bl", "oo", "m"], "ipa": "/bluːm/", "phonicsNote": "bl 连读；oo 发 /uː/", "example": "Flowers will bloom on the plant before the tomatoes will grow." }
+          ],
+          quiz: [
+            { "type": "detail", "question": "What is Step 1?", "options": ["Plant the Seeds", "Water the Seeds", "See the Seedling"], "answer": 0 },
+            { "type": "detail", "question": "How many seeds do you drop in the hole?", "options": ["One", "Two", "Three"], "answer": 1 },
+            { "type": "detail", "question": "When is it time to taste your tomatoes?", "options": ["When they turn red", "When the flowers bloom", "When the seedling pokes out"], "answer": 0 },
+            { "type": "inference", "question": "Why do you tie the tomato plant to a stake?", "options": ["To keep the tall plant standing up", "To keep the soil wet", "To make the tomatoes turn red"], "answer": 0 },
+            { "type": "evidence", "question": "Which sentence tells us where to move the pot?", "options": ["Each day, make sure that the soil is a little wet.", "Move the pot to a warm, sunny place.", "In about a week, you'll see a seedling poke out of the soil!"], "answer": 1 }
+          ],
+          oralQuestions: ["Retell the six steps of growing tomatoes in order.", "Would you like to grow your own tomatoes? Why or why not?"]
+        },
+        {
+          id: "how-many-rhymes", title: "How Many Rhymes?", author: "Cheryl Ryan", level: "G",
+          cover: "assets/image-144.jpg",
+          pages: [
+            { image: "assets/image-145.jpg", pageNo: 3, sentences: ["I had a little dog, and it had no name.", "I had a pretty pony, and it was lame."] },
+            { image: "assets/image-146.jpg", pageNo: 4, sentences: ["A pig in a wig and a dog in a bog.", "How many rhymes each day?", "A flag in a bag and a nag with a tag.", "How many rhymes did I say?"] },
+            { image: "assets/image-147.jpg", pageNo: 5, sentences: ["I had a funny book, and it made me laugh.", "I had a brown cow, and she had a calf."] },
+            { image: "assets/image-148.jpg", pageNo: 6, sentences: ["A pig in a wig and a dog in a bog.", "How many rhymes each day?", "A flag in a bag and a nag with a tag.", "How many rhymes did I say?"] },
+            { image: "assets/image-149.jpg", pageNo: 7, sentences: ["I had a little kitty, and it lived in the city.", "I had a fancy bike, and I gave it to Mike."] },
+            { image: "assets/image-150.jpg", pageNo: 8, sentences: ["A pig in a wig and a dog in a bog.", "How many rhymes each day?", "A flag in a bag and a nag with a tag.", "How many rhymes did I say?"] },
+            { image: "assets/image-151.jpg", pageNo: 9, sentences: ["I had a bad dream, and it made me scream.", "I had eighty legs and a dozen large eggs."] },
+            { image: "assets/image-152.jpg", pageNo: 10, sentences: ["A pig in a wig and a dog in a bog.", "How many rhymes each day?", "A flag in a bag and a nag with a tag.", "How many rhymes did I say?"] }
+          ],
+          words: [
+            { "word": "lame", "meaningZh": "瘸的，跛的", "split": ["l", "a_e", "m"], "ipa": "/leɪm/", "phonicsNote": "a_e 组合发 /eɪ/ 的音", "example": "I had a pretty pony, and it was lame." },
+            { "word": "wig", "meaningZh": "假发", "split": ["w", "i", "g"], "ipa": "/wɪɡ/", "phonicsNote": "短元音 i，发 /ɪ/", "example": "A pig in a wig and a dog in a bog." },
+            { "word": "bog", "meaningZh": "沼泽，泥塘", "split": ["b", "o", "g"], "ipa": "/bɑːɡ/", "phonicsNote": "o 在这里发 /ɑː/，和 dog 押韵", "example": "A pig in a wig and a dog in a bog." },
+            { "word": "fancy", "meaningZh": "别致的，华丽的", "split": ["fan", "cy"], "ipa": "/ˈfænsi/", "phonicsNote": "两个音节，重音在 fan；cy 发 /si/", "example": "I had a fancy bike, and I gave it to Mike." },
+            { "word": "dozen", "meaningZh": "一打（十二个）", "split": ["doz", "en"], "ipa": "/ˈdʌzən/", "phonicsNote": "z 发 /z/ 的音，不要读成 /s/", "example": "I had eighty legs and a dozen large eggs." }
+          ],
+          quiz: [
+            { "type": "detail", "question": "What animal had no name?", "options": ["The little dog", "The pretty pony", "The little kitty"], "answer": 0 },
+            { "type": "detail", "question": "Who did the fancy bike go to?", "options": ["Mike", "Sam", "Bud"], "answer": 0 },
+            { "type": "detail", "question": "In the bad dream, what did the child have?", "options": ["Eighty legs and a dozen large eggs", "A funny book and a brown cow", "A little kitty and a fancy bike"], "answer": 0 },
+            { "type": "inference", "question": "The child dreamed about having eighty legs and a dozen large eggs. What does that tell us about the dream?", "options": ["It was a strange, silly dream", "It was a dream about school", "It really happened"], "answer": 0 },
+            { "type": "evidence", "question": "Which sentence tells us that the pony was lame?", "options": ["I had a pretty pony, and it was lame.", "I had a brown cow, and she had a calf.", "I had a little dog, and it had no name."], "answer": 0 }
+          ],
+          oralQuestions: ["Retell: The book has four little poems and one part that keeps repeating. What animals and things does the child talk about in the four poems?", "Which page picture made you laugh the most? Tell me why."]
+        },
+        {
+          id: "loose-tooth", title: "Loose Tooth", author: "Karen Mockler", level: "G",
+          cover: "assets/image-153.jpg",
+          pages: [
+            { image: "assets/image-154.jpg", pageNo: 3, sentences: ["My tooth is really getting wiggly!", "I think I'm going to lose it soon.", "I wonder how?"] },
+            { image: "assets/image-155.jpg", pageNo: 4, sentences: ["Maybe I'll lose my tooth eating corn on the cob."] },
+            { image: "assets/image-156.jpg", pageNo: 5, sentences: ["Maybe I'll lose my tooth at school.", "Sometimes the lunchroom gets a little crazy."] },
+            { image: "assets/image-157.jpg", pageNo: 6, sentences: ["Maybe I'll lose my tooth on the school bus.", "I helped Sam pull his last tooth.", "He said he'd help pull mine."] },
+            { image: "assets/image-158.jpg", pageNo: 7, sentences: ["Maybe I'll lose my tooth when I least expect it.", "I could trip on the sidewalk and lose it that way."] },
+            { image: "assets/image-159.jpg", pageNo: 8, sentences: ["Maybe I'll lose my tooth when I open my closet door.", "I never go in there unless I really have to."] },
+            { image: "assets/image-160.jpg", pageNo: 9, sentences: ["Maybe I'll lose my tooth while I'm playing with my little sister."] },
+            { image: "assets/image-161.jpg", pageNo: 10, sentences: ["Maybe I'll lose my tooth while walking in my sleep.", "I'll probably wake up when I run into the mailbox."] },
+            { image: "assets/image-162.jpg", pageNo: 11, sentences: ["What if I really lose my tooth and can't find it?", "I guess I'll have to have a talk with the tooth fairy."] },
+            { image: "assets/image-163.jpg", pageNo: 12, sentences: ["Or maybe I just worry too much."] }
+          ],
+          words: [
+            { "word": "wiggly", "meaningZh": "摇晃的，松动的", "split": ["wig", "gly"], "ipa": "/ˈwɪɡli/", "phonicsNote": "词尾的 y 在这里发 /i/ 的音", "example": "My tooth is really getting wiggly!" },
+            { "word": "lunchroom", "meaningZh": "午餐室，食堂", "split": ["lunch", "room"], "ipa": "/ˈlʌntʃruːm/", "phonicsNote": "lunch + room 两个词合起来；oo 发 /uː/", "example": "Sometimes the lunchroom gets a little crazy." },
+            { "word": "sidewalk", "meaningZh": "人行道", "split": ["side", "walk"], "ipa": "/ˈsaɪdwɔːk/", "phonicsNote": "side + walk 合起来；walk 里的 l 不发音", "example": "I could trip on the sidewalk and lose it that way." },
+            { "word": "expect", "meaningZh": "预期，料想", "split": ["ex", "pect"], "ipa": "/ɪkˈspekt/", "phonicsNote": "x 发 /ks/；重音在第二个音节 pect 上", "example": "Maybe I'll lose my tooth when I least expect it." },
+            { "word": "mailbox", "meaningZh": "邮箱", "split": ["mail", "box"], "ipa": "/ˈmeɪlbɑːks/", "phonicsNote": "mail + box 合起来；ai 发 /eɪ/；x 发 /ks/", "example": "I'll probably wake up when I run into the mailbox." }
+          ],
+          quiz: [
+            { "type": "detail", "question": "What might make the boy lose his tooth while eating?", "options": ["Corn on the cob", "A piece of cake", "A glass of milk"], "answer": 0 },
+            { "type": "detail", "question": "Who helped Sam pull his last tooth?", "options": ["The boy (the narrator)", "The boy's little sister", "The tooth fairy"], "answer": 0 },
+            { "type": "detail", "question": "What would wake the boy up if he walked in his sleep?", "options": ["Running into the mailbox", "Losing his tooth at school", "Finding his tooth"], "answer": 0 },
+            { "type": "inference", "question": "The boy imagines many funny ways to lose his tooth, then says, \"Or maybe I just worry too much.\" What does that tell us?", "options": ["He already lost his tooth", "He was only imagining those ways", "His tooth will never fall out"], "answer": 1 },
+            { "type": "evidence", "question": "Which sentence tells us the boy thinks his tooth will fall out soon?", "options": ["My tooth is really getting wiggly!", "I think I'm going to lose it soon.", "Or maybe I just worry too much."], "answer": 1 }
+          ],
+          oralQuestions: ["Retell the story: What does the boy imagine might happen to his loose tooth? Tell me three of his ideas.", "If you had a loose tooth, would you want it to fall out fast or slowly? Tell me why."]
+        },
+        {
+          id: "laws-for-kids", title: "Laws for Kids", author: "Maribeth Boelts", level: "G",
+          cover: "assets/image-164.jpg",
+          pages: [
+            { image: "assets/image-165.jpg", pageNo: 3, sentences: ["Laws are rules that everyone must follow.", "Laws protect people and the things they own."] },
+            { image: "assets/image-166.jpg", pageNo: 4, sentences: ["A law says Bud must be on a leash when we walk.", "The law helps keep Bud and others safe."] },
+            { image: "assets/image-167.jpg", pageNo: 5, sentences: ["A law says Bud must wear a tag with our address on it.", "The law helps people know where Bud lives if he's lost."] },
+            { image: "assets/image-168.jpg", pageNo: 6, sentences: ["A law says kids have to ride in special seats in cars.", "The law helps keep kids safe."] },
+            { image: "assets/image-169.jpg", pageNo: 7, sentences: ["A law says we have to wait for a \"walk\" signal before we cross the street.", "The law helps keep us safe from passing cars."] },
+            { image: "assets/image-170.jpg", pageNo: 8, sentences: ["A law says bike riders must follow the traffic laws.", "The law helps keep bike riders safe."] },
+            { image: "assets/image-171.jpg", pageNo: 9, sentences: ["A law says bike riders must wear helmets when they ride.", "The law helps protect us if we have an accident."] },
+            { image: "assets/image-172.jpg", pageNo: 10, sentences: ["A law says people shouldn't pick flowers in the park.", "The law helps more people enjoy the flowers."] },
+            { image: "assets/image-173.jpg", pageNo: 11, sentences: ["A law says people should put their trash in trash cans.", "The law helps keep the park clean for everyone."] },
+            { image: "assets/image-174.jpg", pageNo: 12, sentences: ["Breaking laws can get you into trouble.", "Following the laws helps everyone stay safe."] }
+          ],
+          words: [
+            { "word": "law", "meaningZh": "法律", "split": ["l", "aw"], "ipa": "/lɔː/", "phonicsNote": "aw 组合发 /ɔː/ 的音", "example": "Laws are rules that everyone must follow." },
+            { "word": "leash", "meaningZh": "狗绳，皮带", "split": ["le", "a", "sh"], "ipa": "/liːʃ/", "phonicsNote": "ea 发长音 /iː/；sh 发 /ʃ/", "example": "A law says Bud must be on a leash when we walk." },
+            { "word": "protect", "meaningZh": "保护", "split": ["pro", "tect"], "ipa": "/prəˈtekt/", "phonicsNote": "两个音节，重音在第二个音节 tect 上", "example": "Laws protect people and the things they own." },
+            { "word": "helmet", "meaningZh": "头盔", "split": ["hel", "met"], "ipa": "/ˈhelmɪt/", "phonicsNote": "两个音节，重音在第一个 hel 上", "example": "A law says bike riders must wear helmets when they ride." },
+            { "word": "accident", "meaningZh": "事故", "split": ["ac", "ci", "dent"], "ipa": "/ˈæksɪdənt/", "phonicsNote": "cc 在这里发 /ks/；重音在第一个音节 ac 上", "example": "The law helps protect us if we have an accident." }
+          ],
+          quiz: [
+            { "type": "detail", "question": "What must Bud wear?", "options": ["A tag with the address on it", "A leash only when it rains", "A helmet"], "answer": 0 },
+            { "type": "detail", "question": "What must kids do in cars?", "options": ["Ride in special seats", "Wear helmets", "Put trash in trash cans"], "answer": 0 },
+            { "type": "detail", "question": "What should people NOT do in the park?", "options": ["Pick the flowers", "Put trash in trash cans", "Cross the street"], "answer": 0 },
+            { "type": "inference", "question": "The book says the law about the \"walk\" signal \"helps keep us safe from passing cars.\" What would probably happen if people did NOT follow that law?", "options": ["They might get hit by passing cars", "Their dog might get lost", "The park would get dirty"], "answer": 0 },
+            { "type": "evidence", "question": "Which sentence tells us why bike riders must wear helmets?", "options": ["The law helps protect us if we have an accident.", "The law helps keep kids safe.", "Following the laws helps everyone stay safe."], "answer": 0 }
+          ],
+          oralQuestions: ["Retell: The book talks about many laws. What are three laws from the book, and who does each law keep safe?", "Which law in the book do you think is the most important? Tell me why."]
+        },
+        {
+          id: "lets-go-to-the-circus", title: "Let's Go to the Circus", author: "Maribeth Boelts", level: "G",
+          cover: "assets/image-175.jpg",
+          pages: [
+            { image: "assets/image-176.jpg", pageNo: 3, sentences: ["The circus comes to town.", "\"Let's go to the circus,\" says Bonk.", "\"I love cotton candy.\"", "\"I like the elephants,\" says Lurk.", "\"The clowns are funny,\" says Jupe."] },
+            { image: "assets/image-177.jpg", pageNo: 4, sentences: ["\"Do we have money?\" asks Jupe.", "Bonk has three pennies and a rock.", "Lurk has a dime and a button.", "Jupe's pockets are empty.", "\"What should we do?\" asks Jupe."] },
+            { image: "assets/image-178.jpg", pageNo: 5, sentences: ["\"Let's have a lemonade stand,\" says Bonk.", "\"Then we will have money.\"", "The monsters cut up lemons.", "They add water and sugar."] },
+            { image: "assets/image-179.jpg", pageNo: 6, sentences: ["They wait and wait.", "No one comes to the stand.", "\"No one is thirsty,\" cries Lurk.", "\"Maybe they are hungry,\" says Bonk.", "\"Let's have a pizza stand.\""] },
+            { image: "assets/image-180.jpg", pageNo: 7, sentences: ["The monsters make the crust.", "They add sauce and cheese.", "They cook the pizza and wait.", "No one comes to the stand.", "\"No one is hungry!\" cries Lurk."] },
+            { image: "assets/image-181.jpg", pageNo: 8, sentences: ["Just then, a monkey runs by.", "It climbs a tree.", "The Ringmonster from the circus chases it."] },
+            { image: "assets/image-182.jpg", pageNo: 9, sentences: ["\"Come back!\" says the Ringmonster.", "The monkey sits high in the tree and laughs.", "\"Can you help me?\" asks the Ringmonster.", "Bonk has an idea."] },
+            { image: "assets/image-183.jpg", pageNo: 10, sentences: ["He puts some pizza on a plate.", "He puts some lemonade in a glass.", "He sets them under the tree."] },
+            { image: "assets/image-184.jpg", pageNo: 11, sentences: ["The monkey climbs down from the tree.", "It eats the pizza and drinks the lemonade.", "\"BURP!\" says the monkey.", "Then it runs back to the circus."] },
+            { image: "assets/image-185.jpg", pageNo: 12, sentences: ["\"Thank you!\" says the Ringmonster.", "\"Would you like to come to the circus with me?\"", "\"Yes!\" say Bonk, Lurk, and Jupe.", "\"Follow the monkey!\" says the Ringmonster."] }
+          ],
+          words: [
+            { "word": "pennies", "meaningZh": "便士硬币（美国 1 分硬币）", "split": ["pen", "nies"], "ipa": "/ˈpɛniz/", "phonicsNote": "ie 发 /iː/，词尾 s 浊化成 /z/", "example": "Bonk has three pennies and a rock." },
+            { "word": "dime", "meaningZh": "一角硬币（美国 10 分硬币）", "split": ["d", "ime"], "ipa": "/daɪm/", "phonicsNote": "i_e 发 /aɪ/，e 不发音", "example": "Lurk has a dime and a button." },
+            { "word": "lemonade", "meaningZh": "柠檬水；柠檬汽水", "split": ["lem", "on", "ade"], "ipa": "/ˌlɛməˈneɪd/", "phonicsNote": "ade 发 /eɪd/，重音在最后一个音节", "example": "He puts some lemonade in a glass." },
+            { "word": "crust", "meaningZh": "（披萨的）面饼边；饼皮", "split": ["cr", "u", "st"], "ipa": "/krʌst/", "phonicsNote": "cr 两个音连读；u 发短音 /ʌ/", "example": "The monsters make the crust." },
+            { "word": "thirsty", "meaningZh": "口渴的", "split": ["thirst", "y"], "ipa": "/ˈθɜːrsti/", "phonicsNote": "th 发 /θ/ 咬舌音；ir 发 /ɜːr/", "example": "\"No one is thirsty,\" cries Lurk." }
+          ],
+          quiz: [
+            { "type": "detail", "question": "Who says \"The clowns are funny\"?", "options": ["Jupe", "Bonk", "Lurk"], "answer": 0 },
+            { "type": "detail", "question": "What does Lurk have?", "options": ["A dime and a button", "Three pennies and a rock", "Empty pockets"], "answer": 0 },
+            { "type": "detail", "question": "What does the monkey say after it eats the pizza and drinks the lemonade?", "options": ["\"BURP!\"", "\"Thank you!\"", "\"Follow the monkey!\""], "answer": 0 },
+            { "type": "inference", "question": "Why does the monkey climb down from the tree?", "options": ["It wants the pizza and lemonade under the tree", "It wants to chase the Ringmonster", "It is afraid of the monsters"], "answer": 0 },
+            { "type": "evidence", "question": "Which sentence tells us that no one came to the pizza stand?", "options": ["They cook the pizza and wait.", "No one comes to the stand.", "\"No one is hungry!\" cries Lurk."], "answer": 1 }
+          ],
+          oralQuestions: ["Tell me the whole story: what did Bonk, Lurk and Jupe do to get money for the circus, and how did they get to the circus in the end?", "Bonk put pizza and lemonade under the tree to help the Ringmonster. Was that a good idea? Why? What would you do if you wanted to help?"]
+        },
+        {
+          id: "long-ago-and-today", title: "Long Ago and Today", author: "Bea Silverberg and Nehemiah Stark", level: "G",
+          cover: "assets/image-186.jpg",
+          pages: [
+            { image: "assets/image-187.jpg", pageNo: 3, sentences: ["\"Great-Grandma,", "what was it like long ago?", "What was it like", "when you were young like me?\""] },
+            { image: "assets/image-188.jpg", pageNo: 4, sentences: ["\"Great-Grandma,", "did you watch TV long ago?", "Did you watch TV", "when you were young like me?\""] },
+            { image: "assets/image-189.jpg", pageNo: 5, sentences: ["\"No, dear Adam,", "we did not have TV.", "I listened to the radio", "when I was young like you.\""] },
+            { image: "assets/image-190.jpg", pageNo: 6, sentences: ["\"Great-Grandma,", "did you fly in an airplane long ago?", "Did you fly in an airplane", "when you were young like me?\""] },
+            { image: "assets/image-191.jpg", pageNo: 7, sentences: ["\"No, dear Adam,", "we did not fly in airplanes.", "I rode on a train", "when I was young like you.\""] },
+            { image: "assets/image-192.jpg", pageNo: 8, sentences: ["\"Great-Grandma,", "did you play video games long ago?", "Did you play video games", "when you were young like me?\""] },
+            { image: "assets/image-193.jpg", pageNo: 9, sentences: ["\"No, dear Adam,", "we did not have video games.", "I played board games", "when I was young like you.\""] },
+            { image: "assets/image-194.jpg", pageNo: 10, sentences: ["\"Great-Grandma,", "did you have plastic toys long ago?", "Did you have plastic toys", "when you were young like me?\""] },
+            { image: "assets/image-195.jpg", pageNo: 11, sentences: ["\"No, dear Adam,", "we did not have plastic toys.", "I played with wooden toys", "when I was young like you.\""] },
+            { image: "assets/image-196.jpg", pageNo: 12, sentences: ["\"Great-Grandma, were you happy", "when you were young like me?\""] },
+            { image: "assets/image-197.jpg", pageNo: 13, sentences: ["\"Yes, Adam, I was happy", "when I was young like you.\""] },
+            { image: "assets/image-198.jpg", pageNo: 14, sentences: ["\"I had a grandma who loved me", "just like I love you.\""] }
+          ],
+          words: [
+            { "word": "radio", "meaningZh": "收音机", "split": ["ra", "di", "o"], "ipa": "/ˈreɪdioʊ/", "phonicsNote": "a 发长音 /eɪ/", "example": "I listened to the radio when I was young like you." },
+            { "word": "board games", "meaningZh": "棋盘游戏；桌游", "split": ["board", "games"], "ipa": "/bɔːrd ɡeɪmz/", "phonicsNote": "oa 发 /ɔː/；a_e 发 /eɪ/，词尾 s 读 /z/", "example": "I played board games when I was young like you." },
+            { "word": "wooden", "meaningZh": "木制的", "split": ["wood", "en"], "ipa": "/ˈwʊdən/", "phonicsNote": "oo 在这里发短音 /ʊ/", "example": "I played with wooden toys when I was young like you." },
+            { "word": "plastic", "meaningZh": "塑料的", "split": ["plas", "tic"], "ipa": "/ˈplæstɪk/", "phonicsNote": "pl 两个音连读；a 发 /æ/", "example": "we did not have plastic toys." },
+            { "word": "rode", "meaningZh": "乘坐（ride 的过去式）", "split": ["r", "o", "d", "e"], "ipa": "/roʊd/", "phonicsNote": "o_e 发 /oʊ/，e 不发音", "example": "I rode on a train when I was young like you." }
+          ],
+          quiz: [
+            { "type": "detail", "question": "What did Great-Grandma listen to when she was young?", "options": ["The radio", "The TV", "Video games"], "answer": 0 },
+            { "type": "detail", "question": "How did Great-Grandma travel when she was young?", "options": ["By train", "By airplane", "By car"], "answer": 0 },
+            { "type": "detail", "question": "What did Great-Grandma play instead of video games?", "options": ["Board games", "Video games", "Plastic toys"], "answer": 0 },
+            { "type": "inference", "question": "What is this book mainly about?", "options": ["How life has changed over time", "How to ride a train", "How to play board games"], "answer": 0 },
+            { "type": "evidence", "question": "Which sentence tells us that Great-Grandma did not have TV?", "options": ["we did not have TV.", "I listened to the radio when I was young like you.", "Did you watch TV long ago?"], "answer": 0 }
+          ],
+          oralQuestions: ["Tell me what Adam asked his Great-Grandma, and what she told him. What was different long ago, and what was the same?", "Great-Grandma says she was happy when she was young, even without TV or video games. Do you think you could be happy without them? Why?"]
+        }
+      ];
+
+      /* ================= Progress storage ================= */
+      var STORE_KEY = "raz-progress-v1";
+      function loadProgress() {
+        try {
+          var raw = localStorage.getItem(STORE_KEY);
+          if (raw) return JSON.parse(raw);
+        } catch (e) { /* storage unavailable */ }
+        return { books: {}, gemsEarned: {} };
+      }
+      function saveProgress() {
+        try { localStorage.setItem(STORE_KEY, JSON.stringify(progress)); } catch (e) { /* ignore */ }
+      }
+      var progress = loadProgress();
+      if (!progress.books) progress.books = {};
+      if (!progress.gemsEarned) progress.gemsEarned = {};
+
+      /* ================= Gems ================= */
+      function gemCount() { return Object.keys(progress.gemsEarned || {}).length; }
+      function updateGems() {
+        document.querySelectorAll(".gem-num").forEach(function (el) { el.textContent = gemCount(); });
+      }
+      function bookProg(id) {
+        if (!progress.books[id]) progress.books[id] = { pagesDone: [], quizBest: null, recordings: {}, oralRecordings: {}, marks: {} };
+        var bp = progress.books[id];
+        if (!bp.pagesDone) bp.pagesDone = [];
+        if (!bp.recordings) bp.recordings = {};
+        if (!bp.oralRecordings) bp.oralRecordings = {};
+        if (!bp.marks) bp.marks = {};
+        if (!bp.wordListened) bp.wordListened = {};
+        if (!bp.wordRecordings) bp.wordRecordings = {};
+        if (!bp.wordRecCounts) bp.wordRecCounts = {};
+        if (!bp.heard) bp.heard = {};
+        if (!bp.recDone) bp.recDone = {};
+        if (!bp.sentRecordings) bp.sentRecordings = {};
+        return bp;
+      }
+
+      /* Inspection mode (nessa 2026-10-19) is OFF again (2026-10-20): the
+         formal gated ABC flow is live — password gate at the door, step locks
+         (words -> story -> quiz), and every Record button waits for a listen
+         first. Flip this back to true only while she is checking screens. */
+      var INSPECT_OPEN = false;
+
+      /* ================= Speech ================= */
+      // Speed (nessa 2026-10-19): the standard speed for ALL speech is 60% of the
+      // old normal rate. The 🐇 normal-speed button sits beside the 🐢, ready for
+      // when she reads faster — normal is available, but never the default.
+      var NORMAL_RATE = 0.9;
+      var SLOW_RATE = 0.54; // 60% of NORMAL_RATE
+      var speechRate = SLOW_RATE;
+      var wordListenSeq = 0; // bumped to cancel any in-progress word-listen chain
+      var listenSeq = 0; // bumped to cancel a pending sentence "heard it" callback
+      function setSpeed(rate) {
+        speechRate = rate;
+        document.getElementById("speed-toggle").classList.toggle("active", rate === SLOW_RATE);
+        document.getElementById("speed-normal").classList.toggle("active", rate === NORMAL_RATE);
+      }
+      document.getElementById("speed-toggle").addEventListener("click", function () { setSpeed(SLOW_RATE); });
+      document.getElementById("speed-normal").addEventListener("click", function () { setSpeed(NORMAL_RATE); });
+      setSpeed(SLOW_RATE);
+      var enVoice = null;
+      function pickVoice() {
+        if (!("speechSynthesis" in window)) return;
+        var voices = speechSynthesis.getVoices();
+        for (var i = 0; i < voices.length; i++) {
+          if (voices[i].lang && voices[i].lang.indexOf("en-US") === 0) { enVoice = voices[i]; return; }
+        }
+        for (var j = 0; j < voices.length; j++) {
+          if (voices[j].lang && voices[j].lang.indexOf("en") === 0) { enVoice = voices[j]; return; }
+        }
+      }
+      if ("speechSynthesis" in window) {
+        pickVoice();
+        speechSynthesis.onvoiceschanged = pickVoice;
+      }
+      var speakGen = 0; // bumped by stopSpeech() so a delayed start can't fire late
+      /* Recorded voice (nessa 2026-10-20, "有两个喇叭，都没有声音"): the
+         tablet's built-in speech stays silent, so finished books play real
+         recorded audio files instead of the device voice. Each finished
+         book (A Seed Grows, Animal Eyes, Going to the Dentist) has ONE
+         merged mp3 — BOOK_AUDIO below maps every text to its [start, end]
+         seconds inside that file, so the whole library stays far under
+         the 500-file publish limit. The remaining 15 books keep the
+         device voice for now. */
+      var BOOK_AUDIO = {
+        "a-seed-grows": { file: "assets/audio-001.mp3", seg: {"buried":[0.0,0.792],"The seed is buried in the soft soil.":[1.142,3.59],"soak up":[3.94,4.972],"The small seed soaks up water from the rain.":[5.322,8.202],"stem":[8.552,9.344],"The leaves and a stem grow up through the ground.":[9.694,12.502],"soil":[12.852,13.644],"A new seed falls into the soft soil.":[13.994,16.682],"sunshine":[17.032,17.992],"The leaves gather in the sunshine.":[18.342,20.502],"A small seed falls to the ground and becomes buried in the soft soil.":[20.852,25.292],"The seed is buried in the soft soil, and the rain falls.":[25.642,29.194],"The rain soaks into the soil that holds the small seed.":[29.544,32.856],"The water helps the seed, and roots grow down deep into the soil.":[33.206,37.286],"The plant uses sunshine to make food.":[37.636,40.324],"The rain and the soil help the small plant.":[40.674,43.482],"The plant grows taller, and more leaves grow on the stem.":[43.832,46.904],"The roots grow longer.":[47.254,48.742],"They go deep in the ground.":[49.092,50.604],"The big plant grows flowers.":[50.954,52.946],"The flowers make seeds.":[53.296,55.048],"What will happen next?":[55.398,56.91]} },
+        "animal-eyes": { file: "assets/audio-002.mp3", seg: {"strange":[0.0,1.08],"Some animal eyes can look very strange!":[1.43,4.262],"clearly":[4.612,5.332],"Most spiders can't see very clearly.":[5.682,8.082],"different":[8.432,9.32],"Each eye can look in a different place.":[9.67,12.07],"dragonfly":[12.42,13.452],"This dragonfly has eyes that are made up of many tiny eyes.":[13.802,17.81],"night":[18.16,18.952],"Its eyes help it see well at night.":[19.302,21.63],"You use your eyes to see.":[21.98,23.66],"Animals use their eyes to see, too.":[24.01,26.17],"Animal eyes can be small or large.":[26.52,28.968],"What animal has eyes that look like this?":[29.318,32.126],"This spider does.":[32.476,33.988],"It has eight eyes that look like little dots.":[34.338,36.93],"But many spiders are very good at seeing things move.":[37.28,40.64],"This owl does.":[40.99,42.31],"An owl cannot move its eyes.":[42.66,44.868],"It must turn its head to look around.":[45.218,47.666],"This kind of lizard does.":[48.016,49.768],"The left eye sees one thing.":[50.118,52.038],"The right eye sees something different at the same time.":[52.388,55.34],"Dragonflies are very good at seeing things move.":[55.69,58.618],"Use your eyes to see all the animal eyes around you.":[58.968,61.968]} },
+        "going-to-the-dentist": { file: "assets/audio-003.mp3", seg: {"scared":[0.0,0.84],"I'm a little scared.":[1.19,2.63],"friendly":[2.98,3.748],"A friendly woman named Jamie asks me to wait.":[4.098,6.786],"helper":[7.136,7.904],"Dana is the dentist's helper.":[8.254,10.102],"filling":[10.452,11.364],"The dentist says I need a filling.":[11.714,13.562],"hurt":[13.912,14.68],"Some of the tools look scary, but the cleaning doesn't hurt.":[15.03,18.318],"I'm going to the dentist.":[18.668,20.108],"She says I can read, play with toys, or watch a movie.":[20.458,23.698],"After a few minutes, Dana calls my name.":[24.048,26.568],"Dana shows me around the office.":[26.918,28.79],"She teaches me how to clean my teeth at home.":[29.14,31.54],"Dana says she will make my teeth super clean.":[31.89,35.01],"She shows me the tools she will use.":[35.36,37.688],"Next, Dana takes special pictures of my teeth.":[38.038,40.99],"The dentist comes to check my teeth.":[41.34,43.188],"She looks at the pictures of my teeth.":[43.538,45.53],"I will have to come back another day.":[45.88,47.992],"I ask if getting the filling will hurt.":[48.342,50.454],"The dentist says it won't hurt much because it will be small.":[50.804,54.044],"The dentist says it's good we found the problem early.":[54.394,57.322],"I'm not happy I need a filling, but I'm glad I went to the dentist!":[57.672,61.392]} }
+      };
+      function hasRecorded(book) { return !!book && !!BOOK_AUDIO[book.id]; }
+      var voicePlayer = new Audio();
+      voicePlayer.preload = "auto";
+      var audioPreloader = new Audio();
+      audioPreloader.preload = "auto";
+      /* Play one [start, end] slice of a merged book file. A 60ms poll stops
+         playback a hair past the segment end — still inside the 0.35s of
+         silence between clips, so the next text never bleeds in. Speed uses
+         playbackRate.
+         Wrong-page fix (nessa 2026-10-26, "这一页读的是上一页的"): the old
+         code set currentTime and called play() in the same tick. On tablet
+         browsers that seek is asynchronous and can be dropped or land late,
+         so playback resumed from the previous slice's position and the
+         child heard the wrong page read aloud. Now: pause, seek, wait for
+         the browser's "seeked" confirmation (with a position re-check and
+         one retry), and only then play. A timeout fallback guarantees a
+         tap is never left unanswered. */
+      function speakSegment(file, start, end, onend) {
+        var gen = ++speakGen;
+        if ("speechSynthesis" in window) speechSynthesis.cancel();
+        var finished = false;
+        var timer = null;
+        function finish() {
+          if (finished || gen !== speakGen) return;
+          finished = true;
+          if (timer) { clearInterval(timer); timer = null; }
+          try { voicePlayer.pause(); } catch (e) { /* ignore */ }
+          if (onend) onend();
+        }
+        voicePlayer.onended = finish;
+        voicePlayer.onerror = finish;
+        try { voicePlayer.preservesPitch = true; } catch (e) { /* ignore */ }
+        var stopAt = end + 0.12;
+        function arm() {
+          if (timer) clearInterval(timer);
+          timer = setInterval(function () {
+            if (gen !== speakGen) { clearInterval(timer); return; }
+            if (voicePlayer.currentTime >= stopAt) finish();
+          }, 60);
+        }
+        function playNow() {
+          if (gen !== speakGen || finished) return;
+          // Set the rate here, not earlier: changing src resets playbackRate.
+          voicePlayer.playbackRate = speechRate / NORMAL_RATE;
+          var pr = voicePlayer.play();
+          if (pr && pr.catch) pr.catch(function () { finish(); });
+          arm();
+        }
+        function seekThenPlay() {
+          if (gen !== speakGen || finished) return;
+          var settled = false;
+          var tries = 0;
+          function cleanup() { voicePlayer.removeEventListener("seeked", onSeeked); }
+          function inSlice() {
+            var t = voicePlayer.currentTime;
+            return t >= start - 0.3 && t <= end;
+          }
+          function onSeeked() {
+            if (settled) return;
+            if (gen !== speakGen || finished) { settled = true; cleanup(); return; }
+            if (!inSlice() && tries < 2) { attempt(); return; }
+            settled = true; cleanup(); playNow();
+          }
+          function attempt() {
+            if (settled || gen !== speakGen || finished) return;
+            tries++;
+            try { voicePlayer.currentTime = start; } catch (e) { /* ignore */ }
+            // Fallback: re-seeking to the position the playhead already
+            // sits at fires no "seeked" event on some browsers.
+            setTimeout(function () {
+              if (settled || gen !== speakGen || finished) return;
+              if (inSlice()) { settled = true; cleanup(); playNow(); }
+              else if (tries < 2) attempt();
+              else { settled = true; cleanup(); playNow(); }
+            }, 400);
+          }
+          voicePlayer.addEventListener("seeked", onSeeked);
+          attempt();
+        }
+        try { voicePlayer.pause(); } catch (e) { /* ignore */ }
+        if (voicePlayer.getAttribute("src") !== file) {
+          voicePlayer.src = file;
+          if (voicePlayer.readyState >= 1) seekThenPlay();
+          else voicePlayer.addEventListener("loadedmetadata", function h() {
+            voicePlayer.removeEventListener("loadedmetadata", h);
+            seekThenPlay();
+          });
+        } else seekThenPlay();
+      }
+      function speak(text, onend) {
+        var ba = (typeof current !== "undefined" && current && current.book) ? BOOK_AUDIO[current.book.id] : null;
+        if (ba && ba.seg[text]) { speakSegment(ba.file, ba.seg[text][0], ba.seg[text][1], onend); return; }
+        if (!("speechSynthesis" in window)) { if (onend) onend(); return; }
+        if (!enVoice) pickVoice();
+        var gen = ++speakGen;
+        try { voicePlayer.pause(); } catch (e) { /* ignore */ }
+        var u = new SpeechSynthesisUtterance(text);
+        u.lang = "en-US";
+        if (enVoice) u.voice = enVoice;
+        u.rate = speechRate;
+        var finished = false;
+        function finish() { if (finished) return; finished = true; if (onend) onend(); }
+        u.onend = finish;
+        u.onerror = finish;
+        // Sound fix (nessa 2026-10-19, "现在没有声音"): cancel() immediately
+        // followed by speak() in the same tick silently drops the new utterance
+        // on Chrome/Android TTS — the button looks alive but nothing is heard.
+        // Only cancel when something is actually playing, give the cancel a
+        // beat to settle, and resume() first in case the synth is stuck paused.
+        var busy = speechSynthesis.speaking || speechSynthesis.pending;
+        if (busy) speechSynthesis.cancel();
+        function start() {
+          if (gen !== speakGen) { finish(); return; }
+          try { speechSynthesis.resume(); } catch (e) { /* ignore */ }
+          speechSynthesis.speak(u);
+        }
+        if (busy) setTimeout(start, 90); else start();
+      }
+      function stopSpeech() {
+        wordListenSeq++;
+        listenSeq++;
+        speakGen++;
+        voicePlayer.onended = null;
+        voicePlayer.onerror = null;
+        try { voicePlayer.pause(); } catch (e) { /* ignore */ }
+        if ("speechSynthesis" in window) speechSynthesis.cancel();
+      }
+
+      /* ================= View switching ================= */
+      var views = { gate: document.getElementById("view-gate"), dashboard: document.getElementById("view-dashboard"), raz: document.getElementById("view-raz"), home: document.getElementById("view-home"), reader: document.getElementById("view-reader"), ledger: document.getElementById("view-ledger") };
+      function goDashboard() { updateGems(); showView("dashboard"); }
+      function showView(name) {
+        stopSpeech();
+        stopSentRecording(true);
+        stopAllOralRecording();
+        stopAllWordRecording();
+        document.getElementById("img-zoom").classList.add("hidden");
+        for (var k in views) views[k].classList.toggle("hidden", k !== name);
+        window.scrollTo(0, 0);
+      }
+
+      /* ================= Total home / RAZ area navigation ================= */
+      document.querySelectorAll(".js-home").forEach(function (b) {
+        b.addEventListener("click", goDashboard);
+      });
+      document.getElementById("tile-raz").addEventListener("click", function () { updateGems(); showView("raz"); });
+      document.getElementById("level-g").addEventListener("click", function () { renderShelf(); showView("home"); });
+      document.getElementById("shelf-to-raz").addEventListener("click", function () { updateGems(); showView("raz"); });
+
+      /* ================= Home shelf ================= */
+      var shelf = document.getElementById("shelf");
+      function renderShelf() {
+        updateGems();
+        shelf.innerHTML = "";
+        BOOKS.forEach(function (book) {
+          var bp = bookProg(book.id);
+          var total = book.pages.length;
+          var done = bp.pagesDone.length;
+          var pct = total ? Math.round((done / total) * 100) : 0;
+          var card = document.createElement("div");
+          card.className = "book-card";
+          var bestLine = bp.quizBest !== null && bp.quizBest !== undefined
+            ? '<p class="done-stamp">✏️ Quiz best: ' + bp.quizBest + " / " + book.quiz.length + "</p>" : "";
+          var doneLine = bookRead(book) ? '<p class="done-stamp">🎉 Finished! 读完啦</p>' : "";
+          card.innerHTML =
+            '<img src="' + book.cover + '" alt="Cover of ' + book.title + '" />' +
+            '<div class="bc-body">' +
+              '<span class="badge">Level ' + book.level + "</span>" +
+              "<h2>" + book.title + "</h2>" +
+              '<p class="author">by ' + book.author + "</p>" +
+              '<div class="prog-line"><div class="prog-bar"><div class="prog-fill" style="width:' + pct + '%"></div></div>' +
+              '<span class="prog-text">' + done + " / " + total + " 页</span></div>" +
+              doneLine + bestLine +
+              '<button class="open-btn">📖 Open</button>' +
+            "</div>";
+          card.querySelector(".open-btn").addEventListener("click", function () { openBook(book.id, 0); });
+          shelf.appendChild(card);
+        });
+      }
+
+      /* ================= Reader ================= */
+      // ABC-style flow (nessa 2026-10-19): no extra words anywhere. Steps unlock in
+      // order — ① Words: every word listened once, then recorded 3 times. ② Story:
+      // one picture + one sentence; listen once to unlock that sentence's Record.
+      // ③ Quiz unlocks only when the whole story is listened + recorded. A book
+      // counts as 已读完 only when the story is done AND the quiz is submitted.
+      var current = null; // {book, pageIndex, sentIndex (flat idx of page start), speakIdx (active sentence on the page), heardNow (session-only heard set)}
+      var currentTab = "words";
+      var quizReturnQi = null; // question index to return to, while the child is hunting in the book
+      var sentRec = { recorder: null, stream: null, chunks: [], blob: null, blobUrl: null };
+
+      function flatSentences(book) {
+        if (book._flat) return book._flat;
+        var flat = [];
+        book.pages.forEach(function (pg, pi) {
+          if (!pg.sentences || !pg.sentences.length) {
+            flat.push({ page: pg, pageIndex: pi, idx: -1, text: null }); // picture-only page
+          } else {
+            pg.sentences.forEach(function (s, si) { flat.push({ page: pg, pageIndex: pi, idx: si, text: s }); });
+          }
+        });
+        book._flat = flat;
+        return flat;
+      }
+      function sentKey(e) { return e.page.pageNo + "-" + e.idx; }
+      /* Page-level walking (nessa 2026-10-20): navigation moves by page; the
+         flat sentence list is only used to resolve which flat entry the
+         active sentence on the current page is, so all per-sentence state
+         (heard / recDone / recordings / marks) keeps its existing keys. */
+      function pageFlatRange(book, pageIndex) {
+        var flat = flatSentences(book);
+        var start = -1, list = [];
+        for (var i = 0; i < flat.length; i++) {
+          if (flat[i].pageIndex === pageIndex) { if (start < 0) start = i; list.push(i); }
+        }
+        return { start: start, list: list };
+      }
+      function activeEntry() {
+        if (!current) return null;
+        var book = current.book;
+        var pg = book.pages[current.pageIndex];
+        if (!pg || !pg.sentences || !pg.sentences.length) return flatSentences(book)[current.sentIndex];
+        var r = pageFlatRange(book, current.pageIndex);
+        var si = current.speakIdx || 0;
+        if (si < 0) si = 0;
+        if (si > pg.sentences.length - 1) si = pg.sentences.length - 1;
+        return flatSentences(book)[r.list[si]];
+      }
+      function wordTakes(bp, wi) {
+        // A recording saved before the 3-take rule counts as 1 take.
+        if (bp.wordRecCounts && bp.wordRecCounts[wi]) return bp.wordRecCounts[wi];
+        return bp.wordRecordings && bp.wordRecordings[wi] ? 1 : 0;
+      }
+      function wordsDone(book) {
+        var bp = bookProg(book.id);
+        return book.words.every(function (w, wi) { return wordTakes(bp, wi) >= 3; });
+      }
+      function quizDone(book) {
+        var bp = bookProg(book.id);
+        return bp.quizBest !== null && bp.quizBest !== undefined;
+      }
+      // 已读完 (nessa 2026-10-19): story finished AND quiz submitted. Finishing
+      // the story alone does not count. The gem already follows this same rule —
+      // it is awarded at quiz submit, never at story end.
+      function bookRead(book) { return storyDone(book) && quizDone(book); }
+      function storyDone(book) {
+        var bp = bookProg(book.id);
+        return flatSentences(book).every(function (e) { return !e.text || !!bp.recDone[sentKey(e)]; });
+      }
+      function bookComplete(book) { return wordsDone(book) && storyDone(book); }
+      function firstUndoneSentence(book) {
+        var bp = bookProg(book.id);
+        var flat = flatSentences(book);
+        for (var i = 0; i < flat.length; i++) {
+          if (flat[i].text && !bp.recDone[sentKey(flat[i])]) return i;
+        }
+        return 0;
+      }
+
+      function openBook(id, pageIndex) {
+        var book = null;
+        BOOKS.forEach(function (b) { if (b.id === id) book = b; });
+        if (!book) return;
+        var startFlat = firstUndoneSentence(book);
+        var startEntry = flatSentences(book)[startFlat];
+        current = { book: book, pageIndex: startEntry.pageIndex, sentIndex: startFlat, speakIdx: startEntry.idx > 0 ? startEntry.idx : 0, heardNow: {} };
+        // Warm the cache with this book's merged audio file so the first
+        // listen tap plays without a loading wait.
+        var baPre = BOOK_AUDIO[book.id];
+        if (baPre && audioPreloader.getAttribute("src") !== baPre.file) audioPreloader.src = baPre.file;
+        quizReturnQi = null;
+        document.getElementById("quiz-return-bar").classList.add("hidden");
+        document.getElementById("reader-title").textContent = book.title;
+        renderWords();
+        resetQuiz();
+        renderOral();
+        showView("reader");
+        switchTab(wordsDone(book) ? "read" : "words");
+        renderSentence();
+        renderSteps();
+      }
+
+      function renderSteps() {
+        if (!current) return;
+        var book = current.book;
+        var wd = wordsDone(book), sd = storyDone(book);
+        var names = { words: "生词 Words", read: "故事 Story", quiz: "测验 Quiz" };
+        var icons = { words: "⭐", read: "📖", quiz: "✏️" };
+        document.querySelectorAll(".step-chip").forEach(function (chip) {
+          var tab = chip.getAttribute("data-tab");
+          var locked = !INSPECT_OPEN && ((tab === "read" && !wd) || (tab === "quiz" && !(wd && sd)));
+          var done = (tab === "words" && wd) || (tab === "read" && sd) ||
+            (tab === "quiz" && bookProg(book.id).quizBest !== null && bookProg(book.id).quizBest !== undefined);
+          chip.classList.toggle("locked", locked);
+          chip.classList.toggle("active", tab === currentTab);
+          chip.textContent = (locked ? "🔒" : done ? "✓" : icons[tab]) + " " + names[tab];
+        });
+      }
+      function denyChip(tab) {
+        var chip = document.querySelector('.step-chip[data-tab="' + tab + '"]');
+        if (!chip) return;
+        chip.classList.remove("shake");
+        void chip.offsetWidth;
+        chip.classList.add("shake");
+      }
+
+      function switchTab(tab) {
+        if (!current) return;
+        if (!INSPECT_OPEN && tab === "read" && !wordsDone(current.book)) { denyChip("read"); return; }
+        if (!INSPECT_OPEN && tab === "quiz" && !bookComplete(current.book)) { denyChip("quiz"); return; }
+        currentTab = tab;
+        document.getElementById("pane-words").classList.toggle("hidden", tab !== "words");
+        document.getElementById("pane-read").classList.toggle("hidden", tab !== "read");
+        document.getElementById("pane-quiz").classList.toggle("hidden", tab !== "quiz");
+        if (tab !== "read") {
+          quizReturnQi = null;
+          document.getElementById("quiz-return-bar").classList.add("hidden");
+          stopSentRecording(true);
+        }
+        stopSpeech();
+        stopAllOralRecording();
+        stopAllWordRecording();
+        renderSteps();
+        window.scrollTo(0, 0);
+      }
+      document.querySelectorAll(".step-chip").forEach(function (chip) {
+        chip.addEventListener("click", function () { switchTab(chip.getAttribute("data-tab")); });
+      });
+
+      /* ---------- Story stage: one page at a time, its sentences grouped ---------- */
+      function renderPageLines() {
+        if (!current) return;
+        var book = current.book;
+        var pg = book.pages[current.pageIndex];
+        var box = document.getElementById("sent-text");
+        box.innerHTML = "";
+        if (!pg || !pg.sentences) return;
+        var bp = bookProg(book.id);
+        var marked = (bp.marks && bp.marks[pg.pageNo]) || [];
+        pg.sentences.forEach(function (s, si) {
+          var btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = "sent-line" + (si === (current.speakIdx || 0) ? " active" : "") + (marked.indexOf(si) !== -1 ? " marked" : "");
+          btn.textContent = s;
+          btn.addEventListener("click", function () {
+            if (!current || current.book !== book) return;
+            stopSentRecording(true);
+            current.speakIdx = si;
+            renderPageLines();
+            resetSentRecUI();
+            updateSentControls();
+            speak(s, null);
+          });
+          box.appendChild(btn);
+        });
+      }
+
+      function renderSentence() {
+        if (!current) return;
+        stopSpeech();
+        stopSentRecording(true);
+        var book = current.book;
+        var flat = flatSentences(book);
+        if (current.sentIndex < 0) current.sentIndex = 0;
+        if (current.sentIndex > flat.length - 1) current.sentIndex = flat.length - 1;
+        var e = flat[current.sentIndex];
+        current.pageIndex = e.pageIndex;
+        var pg = book.pages[current.pageIndex];
+        var sentCount = pg.sentences ? pg.sentences.length : 0;
+        if ((current.speakIdx || 0) > sentCount - 1) current.speakIdx = Math.max(0, sentCount - 1);
+        if ((current.speakIdx || 0) < 0) current.speakIdx = 0;
+
+        // Layout follows how much text the page carries: little text ->
+        // stacked (picture top, sentences below); lots of text -> side
+        // (picture left, sentences right). Buttons stay in the right rail.
+        var totalChars = 0;
+        if (pg.sentences) pg.sentences.forEach(function (s) { totalChars += s.length; });
+        var paneRead = document.getElementById("pane-read");
+        paneRead.classList.add("pg");
+        paneRead.classList.toggle("pg-side", totalChars > 55);
+
+        var img = document.getElementById("page-img");
+        img.src = pg.image;
+        img.alt = book.title + ", page " + pg.pageNo;
+        document.getElementById("page-frac").textContent = (current.pageIndex + 1) + " / " + book.pages.length;
+
+        document.getElementById("sent-stage").classList.toggle("hidden", !sentCount);
+        renderPageLines();
+
+        var bp = bookProg(book.id);
+        if (bp.pagesDone.indexOf(pg.pageNo) === -1) { bp.pagesDone.push(pg.pageNo); saveProgress(); }
+
+        resetSentRecUI();
+        updateSentControls();
+        updateFinish();
+        window.scrollTo(0, 0);
+      }
+
+      function updateSentControls() {
+        if (!current) return;
+        var book = current.book;
+        var e = activeEntry();
+        var bp = bookProg(book.id);
+        var hasText = !!e.text;
+        var k = sentKey(e);
+        var heard = hasText && (!!bp.recDone[k] || !!(current.heardNow && current.heardNow[k]));
+        var recording = !!(sentRec.recorder && sentRec.recorder.state === "recording");
+        var recBtn = document.getElementById("sent-record");
+        document.getElementById("sent-listen").classList.toggle("hidden", !hasText);
+        recBtn.classList.toggle("hidden", !hasText);
+        recBtn.disabled = !INSPECT_OPEN && !heard && !recording;
+        recBtn.classList.toggle("ready", heard && !bp.recDone[k] && !recording);
+        recBtn.classList.toggle("done", !!bp.recDone[k] && !recording);
+        recBtn.classList.toggle("recording", recording);
+        recBtn.textContent = recording ? "⏹" : bp.recDone[k] ? "🎙✓" : "🎙";
+        document.getElementById("prev-sent").disabled = current.pageIndex === 0;
+        document.getElementById("next-sent").disabled = current.pageIndex === book.pages.length - 1;
+      }
+
+      function updateFinish() {
+        if (!current) return;
+        document.getElementById("finish-box").classList.toggle("hidden",
+          !(bookComplete(current.book) && current.pageIndex === current.book.pages.length - 1));
+      }
+
+      /* Listen once -> this sentence's Record button unlocks. A timed fallback calls
+         the same unlock, so a device whose TTS never fires "end" can't soft-lock. */
+      document.getElementById("sent-listen").addEventListener("click", function () {
+        if (!current) return;
+        var book = current.book;
+        var e = activeEntry();
+        if (!e.text) return;
+        stopSentRecording(true);
+        var k = sentKey(e);
+        var seq = ++listenSeq;
+        var finished = false;
+        function heardIt() {
+          if (finished || seq !== listenSeq) return;
+          finished = true;
+          var bp = bookProg(book.id);
+          if (!bp.heard[k]) { bp.heard[k] = true; saveProgress(); }
+          if (current && current.book === book) {
+            if (!current.heardNow) current.heardNow = {};
+            current.heardNow[k] = true;
+          }
+          updateSentControls();
+        }
+        speak(e.text, heardIt);
+        setTimeout(heardIt, Math.max(1600, e.text.length * (speechRate < NORMAL_RATE ? 150 : 105) + 500));
+      });
+
+      /* ---------- Sentence recorder ---------- */
+      function resetSentRecUI() {
+        var strip = document.getElementById("sent-rec-strip");
+        var audio = document.getElementById("sent-rec-playback");
+        var saveBtn = document.getElementById("sent-rec-save");
+        document.getElementById("sent-saved-note").classList.add("hidden");
+        document.getElementById("sent-rec-error").classList.add("hidden");
+        sentRec.blob = null;
+        if (sentRec.blobUrl) { URL.revokeObjectURL(sentRec.blobUrl); sentRec.blobUrl = null; }
+        if (!current) { strip.classList.add("hidden"); return; }
+        var e = activeEntry();
+        var bp = bookProg(current.book.id);
+        var saved = e.text ? bp.sentRecordings[sentKey(e)] : null;
+        if (saved) {
+          audio.src = saved;
+          strip.classList.remove("hidden");
+          saveBtn.classList.add("hidden");
+        } else {
+          audio.removeAttribute("src");
+          strip.classList.add("hidden");
+          saveBtn.classList.remove("hidden");
+        }
+      }
+      function stopSentRecording(silent) {
+        if (sentRec.recorder && sentRec.recorder.state === "recording") {
+          sentRec.recorder.onstop = silent ? null : sentRec.recorder.onstop;
+          try { sentRec.recorder.stop(); } catch (err) { /* ignore */ }
+        }
+        if (sentRec.stream) { sentRec.stream.getTracks().forEach(function (t) { t.stop(); }); sentRec.stream = null; }
+        if (current) updateSentControls();
+      }
+      document.getElementById("sent-record").addEventListener("click", function () {
+        if (!current) return;
+        if (sentRec.recorder && sentRec.recorder.state === "recording") {
+          try { sentRec.recorder.stop(); } catch (err) { /* ignore */ }
+          return;
+        }
+        var errEl = document.getElementById("sent-rec-error");
+        errEl.classList.add("hidden");
+        stopSpeech();
+        stopAllOralRecording();
+        stopAllWordRecording();
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia || typeof MediaRecorder === "undefined") {
+          errEl.textContent = "这个浏览器不支持录音，请换 Chrome 或 Safari 试试。";
+          errEl.classList.remove("hidden");
+          return;
+        }
+        navigator.mediaDevices.getUserMedia({ audio: true }).then(function (stream) {
+          sentRec.stream = stream;
+          sentRec.chunks = [];
+          sentRec.recorder = new MediaRecorder(stream);
+          sentRec.recorder.ondataavailable = function (ev) { if (ev.data && ev.data.size) sentRec.chunks.push(ev.data); };
+          sentRec.recorder.onstop = function () {
+            if (sentRec.stream) { sentRec.stream.getTracks().forEach(function (t) { t.stop(); }); sentRec.stream = null; }
+            sentRec.blob = new Blob(sentRec.chunks, { type: sentRec.recorder.mimeType || "audio/webm" });
+            if (sentRec.blobUrl) URL.revokeObjectURL(sentRec.blobUrl);
+            sentRec.blobUrl = URL.createObjectURL(sentRec.blob);
+            document.getElementById("sent-rec-playback").src = sentRec.blobUrl;
+            document.getElementById("sent-rec-strip").classList.remove("hidden");
+            document.getElementById("sent-rec-save").classList.remove("hidden");
+            document.getElementById("sent-saved-note").classList.add("hidden");
+            updateSentControls();
+          };
+          sentRec.recorder.start();
+          updateSentControls();
+        }).catch(function () {
+          errEl.textContent = "没有拿到麦克风权限，录不了音。请在浏览器里允许使用麦克风后再试。";
+          errEl.classList.remove("hidden");
+        });
+      });
+      document.getElementById("sent-rec-save").addEventListener("click", function () {
+        if (!sentRec.blob || !current) return;
+        var book = current.book;
+        var e = activeEntry();
+        var k = sentKey(e);
+        var reader = new FileReader();
+        reader.onload = function () {
+          var bp = bookProg(book.id);
+          bp.sentRecordings[k] = reader.result;
+          bp.recDone[k] = true;
+          saveProgress();
+          document.getElementById("sent-saved-note").classList.remove("hidden");
+          document.getElementById("sent-rec-save").classList.add("hidden");
+          renderSteps();
+          updateSentControls();
+          updateFinish();
+          if (!current || current.book !== book) return;
+          var pgNow = book.pages[current.pageIndex];
+          var total = pgNow.sentences ? pgNow.sentences.length : 0;
+          var hasNext = (current.speakIdx || 0) < total - 1 || current.pageIndex < book.pages.length - 1;
+          if (hasNext) {
+            setTimeout(function () {
+              if (!current || current.book !== book) return;
+              if ((current.speakIdx || 0) < total - 1) {
+                current.speakIdx++;
+              } else {
+                current.pageIndex++;
+                current.sentIndex = pageFlatRange(book, current.pageIndex).start;
+                current.speakIdx = 0;
+              }
+              renderSentence();
+            }, 650);
+          }
+        };
+        reader.readAsDataURL(sentRec.blob);
+      });
+
+      document.getElementById("prev-sent").addEventListener("click", function () {
+        if (current && current.pageIndex > 0) {
+          current.pageIndex--;
+          current.sentIndex = pageFlatRange(current.book, current.pageIndex).start;
+          current.speakIdx = 0;
+          renderSentence();
+        }
+      });
+      document.getElementById("next-sent").addEventListener("click", function () {
+        if (current && current.pageIndex < current.book.pages.length - 1) {
+          current.pageIndex++;
+          current.sentIndex = pageFlatRange(current.book, current.pageIndex).start;
+          current.speakIdx = 0;
+          renderSentence();
+        }
+      });
+
+      /* ---------- Look in the book + child's own sentence marks ---------- */
+      function goLookInBook(qi) {
+        if (!current) return;
+        quizReturnQi = qi;
+        document.getElementById("quiz-return-bar").classList.remove("hidden");
+        switchTab("read");
+        window.scrollTo(0, 0);
+      }
+      document.getElementById("quiz-back").addEventListener("click", function () {
+        var qi = quizReturnQi;
+        quizReturnQi = null;
+        document.getElementById("quiz-return-bar").classList.add("hidden");
+        switchTab("quiz");
+        if (qi !== null && qi !== undefined) {
+          var el = document.getElementById("quiz-q-" + qi);
+          if (el) el.scrollIntoView({ block: "start" });
+        }
+      });
+      document.getElementById("mark-current").addEventListener("click", function () {
+        if (!current) return;
+        var book = current.book;
+        var e = activeEntry();
+        if (!e.text) return;
+        var bp = bookProg(book.id);
+        if (!bp.marks) bp.marks = {};
+        var arr = bp.marks[e.page.pageNo] || [];
+        var at = arr.indexOf(e.idx);
+        if (at === -1) arr.push(e.idx); else arr.splice(at, 1);
+        if (arr.length) bp.marks[e.page.pageNo] = arr; else delete bp.marks[e.page.pageNo];
+        saveProgress();
+        renderPageLines();
+      });
+
+      /* ---------- Page image zoom (tap the page image to see it full-screen) ---------- */
+      function openZoom(src, alt) {
+        var z = document.getElementById("img-zoom");
+        var zi = document.getElementById("img-zoom-img");
+        zi.src = src;
+        zi.alt = (alt || "") + " (enlarged)";
+        z.classList.remove("hidden");
+      }
+      document.getElementById("page-img").addEventListener("click", function () {
+        if (!current) return;
+        var e = flatSentences(current.book)[current.sentIndex];
+        openZoom(e.page.image, current.book.title + ", page " + e.page.pageNo);
+      });
+      document.getElementById("img-zoom").addEventListener("click", function () {
+        document.getElementById("img-zoom").classList.add("hidden");
+      });
+
+      document.getElementById("goto-quiz").addEventListener("click", function () { switchTab("quiz"); });
+      document.getElementById("back-home").addEventListener("click", function () {
+        renderShelf(); showView("home");
+      });
+
+      /* ================= Words ================= */
+      // Every word card (nessa 2026-10-19): listen to the word ONCE — only then
+      // does that card's Record button unlock; the word counts as done after
+      // 3 saved recordings. When all 5 words are done, the Story step unlocks.
+      var wordRecs = []; // per-card recorder state for the current book
+      function stopOneWordRec(st) {
+        if (st && st.recorder && st.recorder.state === "recording") {
+          st.recorder.onstop = null;
+          try { st.recorder.stop(); } catch (e) { /* ignore */ }
+        }
+        if (st && st.stream) { st.stream.getTracks().forEach(function (t) { t.stop(); }); st.stream = null; }
+        if (st && st.btn) { st.btn.textContent = "🎙 Record"; st.btn.classList.remove("recording"); }
+      }
+      function stopAllWordRecording() {
+        wordRecs.forEach(function (st) { stopOneWordRec(st); });
+      }
+      function speakWordTimes(word, countEl, btn, times, onDone) {
+        var seq = ++wordListenSeq;
+        var n = 0;
+        btn.disabled = true;
+        function step() {
+          if (seq !== wordListenSeq || !countEl.isConnected) { btn.disabled = false; return; }
+          n++;
+          if (n > times) {
+            btn.disabled = false;
+            countEl.textContent = "✓";
+            if (onDone) onDone();
+            return;
+          }
+          countEl.textContent = n + " / " + times;
+          // Timed fallback: if this device's TTS never fires "end", still advance,
+          // so the listen chain can never soft-lock the Record button.
+          var advanced = false;
+          function adv() { if (advanced) return; advanced = true; step(); }
+          speak(word, adv);
+          setTimeout(adv, 1400);
+        }
+        step();
+      }
+      function sayBlockHtml() {
+        return '<div class="say-row">' +
+            '<button class="listen3-btn">🔊</button>' +
+            '<span class="say-count"></span>' +
+            '<button class="rec-btn word-rec-btn" disabled>🎙 Record</button>' +
+            '<button class="save-btn word-save-btn" disabled>Save</button>' +
+          "</div>" +
+          '<audio controls class="hidden"></audio>' +
+          '<p class="rec-error hidden"></p>';
+      }
+
+      function renderWords() {
+        stopAllWordRecording();
+        wordRecs = [];
+        var list = document.getElementById("word-list");
+        list.innerHTML = "";
+        current.book.words.forEach(function (w, wi) {
+          var card = document.createElement("div");
+          card.className = "word-card";
+
+          var splitHtml = w.split.map(function (c) { return '<span class="chunk"></span>'; }).join('<span class="dot">·</span>');
+          card.innerHTML =
+            '<div class="word-top">' +
+              '<span class="w"></span>' +
+              '<span class="ipa"></span>' +
+              '<span class="zh"></span>' +
+            "</div>" +
+            '<div class="word-meta">' +
+              '<div><span class="lbl">拼读拆分 SOUND IT OUT&nbsp;&nbsp;</span><span class="split-text">' + splitHtml + "</span></div>" +
+              (w.phonicsNote ? '<div class="zh" style="font-size:14px;"></div>' : "") +
+            "</div>" +
+            '<div class="example-row"><span class="ex"></span>' + (hasRecorded(current.book) ? "" : '<button class="ex-spk" aria-label="听例句">🔊</button>') + "</div>" +
+            sayBlockHtml();
+
+          card.querySelector(".w").textContent = w.word;
+          card.querySelector(".ipa").textContent = w.ipa;
+          card.querySelector(".zh").textContent = w.meaningZh;
+          var chunks = card.querySelectorAll(".split-text .chunk");
+          w.split.forEach(function (c, i) { chunks[i].textContent = c; });
+          if (w.phonicsNote) {
+            var noteEl = card.querySelector(".word-meta .zh");
+            if (noteEl) noteEl.textContent = "💡 " + w.phonicsNote;
+          }
+          var exEl = card.querySelector(".ex");
+          exEl.textContent = w.example;
+          // bold the target word inside the example
+          var lower = w.example.toLowerCase(), target = w.word.toLowerCase();
+          var pos = lower.indexOf(target);
+          if (pos === -1 && target.indexOf(" ") !== -1) pos = lower.indexOf(target.split(" ")[0]);
+          if (pos !== -1) {
+            var len = target.indexOf(" ") !== -1 && lower.indexOf(target) === -1 ? target.split(" ")[0].length : target.length;
+            exEl.innerHTML = "";
+            exEl.appendChild(document.createTextNode(w.example.slice(0, pos)));
+            var bEl = document.createElement("b");
+            bEl.textContent = w.example.slice(pos, pos + len);
+            exEl.appendChild(bEl);
+            exEl.appendChild(document.createTextNode(w.example.slice(pos + len)));
+          }
+          var exSpk = card.querySelector(".ex-spk");
+          if (exSpk) exSpk.addEventListener("click", function () { speak(w.example); });
+          else { exEl.style.cursor = "pointer"; exEl.addEventListener("click", function () { speak(w.example); }); }
+
+          list.appendChild(card);
+          setupWordSay(card, w, wi);
+        });
+      }
+
+      function setupWordSay(card, w, wi) {
+        var book = current.book;
+        var bp = bookProg(book.id);
+        var countEl = card.querySelector(".say-count");
+        var listenBtn = card.querySelector(".listen3-btn");
+        var recBtn = card.querySelector(".word-rec-btn");
+        var saveBtn = card.querySelector(".word-save-btn");
+        var audio = card.querySelector("audio");
+        var errNote = card.querySelector(".rec-error");
+        var st = { recorder: null, stream: null, chunks: [], blob: null, blobUrl: null, btn: recBtn };
+        wordRecs.push(st);
+
+        function refresh() {
+          var bpNow = bookProg(book.id);
+          var listened = !!bpNow.wordListened[wi];
+          var takes = wordTakes(bpNow, wi);
+          recBtn.disabled = !INSPECT_OPEN && !listened && takes === 0;
+          recBtn.textContent = takes >= 3 ? "🎙✓" : "🎙 Record";
+          if (takes >= 3) countEl.textContent = "✓ 3 / 3";
+          else if (takes > 0) countEl.textContent = "🎙 " + takes + " / 3";
+          else if (listened) countEl.textContent = "✓";
+        }
+        var savedUrl = bp.wordRecordings ? bp.wordRecordings[wi] : null;
+        if (savedUrl) {
+          audio.src = savedUrl;
+          audio.classList.remove("hidden");
+        }
+        refresh();
+
+        listenBtn.addEventListener("click", function () {
+          errNote.classList.add("hidden");
+          stopAllWordRecording();
+          speakWordTimes(w.word, countEl, listenBtn, 1, function () {
+            var bp2 = bookProg(book.id);
+            bp2.wordListened[wi] = true;
+            saveProgress();
+            refresh();
+          });
+        });
+
+        recBtn.addEventListener("click", function () {
+          if (st.recorder && st.recorder.state === "recording") {
+            try { st.recorder.stop(); } catch (e) { /* ignore */ }
+            return;
+          }
+          errNote.classList.add("hidden");
+          stopSpeech();
+          stopSentRecording(true);
+          stopAllOralRecording();
+          if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia || typeof MediaRecorder === "undefined") {
+            errNote.textContent = "这个浏览器不支持录音，请换 Chrome 或 Safari 试试。";
+            errNote.classList.remove("hidden");
+            return;
+          }
+          navigator.mediaDevices.getUserMedia({ audio: true }).then(function (stream) {
+            st.stream = stream;
+            st.chunks = [];
+            st.recorder = new MediaRecorder(stream);
+            st.recorder.ondataavailable = function (e) { if (e.data && e.data.size) st.chunks.push(e.data); };
+            st.recorder.onstop = function () {
+              if (st.stream) { st.stream.getTracks().forEach(function (t) { t.stop(); }); st.stream = null; }
+              st.blob = new Blob(st.chunks, { type: st.recorder.mimeType || "audio/webm" });
+              if (st.blobUrl) URL.revokeObjectURL(st.blobUrl);
+              st.blobUrl = URL.createObjectURL(st.blob);
+              audio.src = st.blobUrl;
+              audio.classList.remove("hidden");
+              saveBtn.disabled = false;
+              recBtn.textContent = "🎙 Record";
+              recBtn.classList.remove("recording");
+            };
+            st.recorder.start();
+            recBtn.textContent = "⏹ Stop";
+            recBtn.classList.add("recording");
+          }).catch(function () {
+            errNote.textContent = "没有拿到麦克风权限，录不了音。请在浏览器里允许使用麦克风后再试。";
+            errNote.classList.remove("hidden");
+          });
+        });
+
+        saveBtn.addEventListener("click", function () {
+          if (!st.blob) return;
+          var reader = new FileReader();
+          reader.onload = function () {
+            var bp2 = bookProg(book.id);
+            if (!bp2.wordRecordings) bp2.wordRecordings = {};
+            if (!bp2.wordRecCounts) bp2.wordRecCounts = {};
+            var prev = wordTakes(bp2, wi);
+            bp2.wordRecordings[wi] = reader.result; // playback keeps the latest take
+            bp2.wordRecCounts[wi] = Math.min(3, prev + 1);
+            st.blob = null;
+            saveProgress();
+            saveBtn.disabled = true;
+            refresh();
+            renderSteps();
+          };
+          reader.readAsDataURL(st.blob);
+        });
+      }
+
+      /* ================= Quiz: Part 1 choice questions ================= */
+      var quizState = null;
+      function resetQuiz() {
+        quizState = { answers: {}, checked: false, score: 0, gemEarned: false };
+        renderQuiz();
+      }
+      var TYPE_LABEL = { detail: "DETAIL 细节题", inference: "THINK 推断题", evidence: "FIND THE EVIDENCE 找证据题" };
+      function renderQuiz() {
+        var area = document.getElementById("quiz-area");
+        area.innerHTML = "";
+        var book = current.book;
+        var bp = bookProg(book.id);
+
+        if (quizState.checked) {
+          var box = document.createElement("div");
+          box.className = "score-box";
+          var stars = "";
+          for (var s = 0; s < book.quiz.length; s++) stars += s < quizState.score ? "⭐" : "☆";
+          box.innerHTML = '<div class="big">' + quizState.score + " / " + book.quiz.length + "</div>" +
+            "<div style='font-size:26px;'>" + stars + "</div>" +
+            "<p>" + (quizState.score === book.quiz.length ? "Perfect! 全对，太棒了！" : "Good job!") +
+            (bp.quizBest !== null && bp.quizBest !== undefined ? "<br />最好成绩 Best: " + bp.quizBest + " / " + book.quiz.length : "") + "</p>" +
+            (quizState.gemEarned
+              ? '<p class="gem-party">🎉💎 叮！这本书完成啦，你拿到 1 颗宝石！现在一共有 ' + gemCount() + " 颗宝石。</p>"
+              : (progress.gemsEarned[book.id] ? '<p class="gem-party">💎 这本书的宝石已经拿到过啦，现在一共有 ' + gemCount() + " 颗宝石。</p>" : ""));
+          area.appendChild(box);
+        }
+        book.quiz.forEach(function (q, qi) {
+          var card = document.createElement("div");
+          card.className = "quiz-q";
+          card.id = "quiz-q-" + qi;
+          card.innerHTML = '<span class="q-type">' + (TYPE_LABEL[q.type] || "") + "</span><h3></h3>";
+          card.querySelector("h3").textContent = (qi + 1) + ". " + q.question;
+          q.options.forEach(function (opt, oi) {
+            var b = document.createElement("button");
+            b.className = "opt";
+            b.textContent = opt;
+            if (quizState.answers[qi] === oi) b.classList.add("selected");
+            if (quizState.checked) b.disabled = true;
+            b.addEventListener("click", function () {
+              if (quizState.checked) return;
+              quizState.answers[qi] = oi;
+              renderQuiz();
+            });
+            card.appendChild(b);
+          });
+          if (!quizState.checked) {
+            var clue = document.createElement("button");
+            clue.className = "clue-btn";
+            clue.textContent = "📖 去原文找一找 Look in the Book";
+            clue.addEventListener("click", function () { goLookInBook(qi); });
+            card.appendChild(clue);
+          }
+          area.appendChild(card);
+        });
+        var action = document.createElement("button");
+        action.className = "check-btn";
+        if (!quizState.checked) {
+          action.textContent = "✔ 交卷 Check My Score";
+          action.addEventListener("click", function () {
+            var answered = Object.keys(quizState.answers).length;
+            if (answered < book.quiz.length) {
+              action.textContent = "还有 " + (book.quiz.length - answered) + " 题没答，先答完哦！";
+              return;
+            }
+            var score = 0;
+            book.quiz.forEach(function (q, qi) { if (quizState.answers[qi] === q.answer) score++; });
+            quizState.score = score;
+            quizState.checked = true;
+            quizState.gemEarned = false;
+            var bp2 = bookProg(book.id);
+            if (bp2.quizBest === null || bp2.quizBest === undefined || score > bp2.quizBest) bp2.quizBest = score;
+            if (!progress.gemsEarned[book.id]) {
+              progress.gemsEarned[book.id] = true;
+              quizState.gemEarned = true;
+            }
+            saveProgress();
+            updateGems();
+            renderQuiz();
+            window.scrollTo(0, 0);
+          });
+        } else {
+          action.textContent = "↻ 再做一次 Try Again";
+          action.addEventListener("click", resetQuiz);
+        }
+        area.appendChild(action);
+      }
+
+      /* ================= Quiz: Part 2 oral questions (record your answer) ================= */
+      var oralRecs = []; // per-question recorder state for the current book
+      function stopAllOralRecording() {
+        oralRecs.forEach(function (st) {
+          if (st && st.recorder && st.recorder.state === "recording") {
+            st.recorder.onstop = null;
+            try { st.recorder.stop(); } catch (e) { /* ignore */ }
+          }
+          if (st && st.stream) { st.stream.getTracks().forEach(function (t) { t.stop(); }); st.stream = null; }
+          if (st && st.btn) { st.btn.textContent = "● Record 录音回答"; st.btn.classList.remove("recording"); }
+        });
+      }
+      function renderOral() {
+        stopAllOralRecording();
+        oralRecs = [];
+        var area = document.getElementById("oral-area");
+        area.innerHTML = "";
+        if (!current) return;
+        var book = current.book;
+        var bp = bookProg(book.id);
+
+        (book.oralQuestions || []).forEach(function (question, qi) {
+          var st = { recorder: null, stream: null, chunks: [], blob: null, blobUrl: null, btn: null };
+          oralRecs[qi] = st;
+          var card = document.createElement("div");
+          card.className = "oral-q";
+          card.innerHTML =
+            '<span class="q-type">SPEAK 说一说 · Question ' + (qi + 1) + "</span>" +
+            "<h3></h3>" +
+            '<div class="rec-row">' +
+              '<button class="rec-btn">● Record 录音回答</button>' +
+              '<button class="save-btn" disabled>Save 保存这一遍</button>' +
+            "</div>" +
+            '<audio controls class="hidden"></audio>' +
+            '<p class="saved-note hidden">✅ Saved! 录音保存好了，妈妈可以在账本里听。</p>' +
+            '<p class="rec-error hidden"></p>';
+          card.querySelector("h3").textContent = question;
+          var btn = card.querySelector(".rec-btn");
+          var saveBtn = card.querySelector(".save-btn");
+          var audio = card.querySelector("audio");
+          var savedNote = card.querySelector(".saved-note");
+          var errNote = card.querySelector(".rec-error");
+          st.btn = btn;
+
+          var saved = bp.oralRecordings ? bp.oralRecordings[qi] : null;
+          if (saved) {
+            audio.src = saved;
+            audio.classList.remove("hidden");
+            savedNote.classList.remove("hidden");
+          }
+
+          btn.addEventListener("click", function () {
+            if (st.recorder && st.recorder.state === "recording") {
+              try { st.recorder.stop(); } catch (e) { /* ignore */ }
+              return;
+            }
+            errNote.classList.add("hidden");
+            stopSpeech();
+            stopSentRecording(true);
+            oralRecs.forEach(function (other) {
+              if (other !== st && other.recorder && other.recorder.state === "recording") {
+                other.recorder.onstop = null;
+                try { other.recorder.stop(); } catch (e) { /* ignore */ }
+                if (other.stream) { other.stream.getTracks().forEach(function (t) { t.stop(); }); other.stream = null; }
+                if (other.btn) { other.btn.textContent = "● Record 录音回答"; other.btn.classList.remove("recording"); }
+              }
+            });
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia || typeof MediaRecorder === "undefined") {
+              errNote.textContent = "这个浏览器不支持录音，请换 Chrome 或 Safari 试试。";
+              errNote.classList.remove("hidden");
+              return;
+            }
+            navigator.mediaDevices.getUserMedia({ audio: true }).then(function (stream) {
+              st.stream = stream;
+              st.chunks = [];
+              st.recorder = new MediaRecorder(stream);
+              st.recorder.ondataavailable = function (e) { if (e.data && e.data.size) st.chunks.push(e.data); };
+              st.recorder.onstop = function () {
+                if (st.stream) { st.stream.getTracks().forEach(function (t) { t.stop(); }); st.stream = null; }
+                st.blob = new Blob(st.chunks, { type: st.recorder.mimeType || "audio/webm" });
+                if (st.blobUrl) URL.revokeObjectURL(st.blobUrl);
+                st.blobUrl = URL.createObjectURL(st.blob);
+                audio.src = st.blobUrl;
+                audio.classList.remove("hidden");
+                saveBtn.disabled = false;
+                savedNote.classList.add("hidden");
+                btn.textContent = "● Record 录音回答";
+                btn.classList.remove("recording");
+              };
+              st.recorder.start();
+              btn.textContent = "⏹ Stop 说完了";
+              btn.classList.add("recording");
+            }).catch(function () {
+              errNote.textContent = "没有拿到麦克风权限，录不了音。请在浏览器里允许使用麦克风后再试。";
+              errNote.classList.remove("hidden");
+            });
+          });
+
+          saveBtn.addEventListener("click", function () {
+            if (!st.blob) return;
+            var reader = new FileReader();
+            reader.onload = function () {
+              var bp2 = bookProg(book.id);
+              if (!bp2.oralRecordings) bp2.oralRecordings = {};
+              bp2.oralRecordings[qi] = reader.result;
+              saveProgress();
+              savedNote.classList.remove("hidden");
+              saveBtn.disabled = true;
+            };
+            reader.readAsDataURL(st.blob);
+          });
+
+          area.appendChild(card);
+        });
+      }
+
+      /* ================= Parent ledger ================= */
+      document.getElementById("open-ledger").addEventListener("click", function () { renderLedger(); showView("ledger"); });
+      document.getElementById("ledger-back").addEventListener("click", function () { goDashboard(); });
+      function renderLedger() {
+        var area = document.getElementById("ledger-area");
+        area.innerHTML = "";
+        BOOKS.forEach(function (book) {
+          var bp = bookProg(book.id);
+          var card = document.createElement("div");
+          card.className = "ledger-card";
+          var pagesTxt = bp.pagesDone.length
+            ? "已读 " + bp.pagesDone.length + " / " + book.pages.length + " 页（第 " + bp.pagesDone.slice().sort(function (a, b) { return a - b; }).join("、") + " 页）"
+            : "还没开始读";
+          var quizTxt = (bp.quizBest === null || bp.quizBest === undefined)
+            ? "小测验还没做" : "小测验最好成绩：" + bp.quizBest + " / " + book.quiz.length;
+          var readTxt = bookRead(book)
+            ? "✅ 已读完（故事读完＋测验做完）"
+            : "⬜ 还没读完（故事读完、测验也做完，才算已读完）";
+          card.innerHTML = "<h3>📚 RAZ · " + book.title + "</h3>" +
+            '<p class="en">Level ' + book.level + (book.series ? " · " + book.series : "") + " · by " + book.author + "</p>" +
+            "<p>📖 阅读进度：" + pagesTxt + "</p>" +
+            "<p>✏️ " + quizTxt + "</p>" +
+            "<p>" + readTxt + "</p>";
+          var oralKeys = bp.oralRecordings ? Object.keys(bp.oralRecordings) : [];
+          if (oralKeys.length) {
+            var op = document.createElement("p");
+            op.textContent = "🗣️ 问答题口述回答（点开就能听）：";
+            card.appendChild(op);
+            oralKeys.sort(function (a, b) { return a - b; }).forEach(function (qk) {
+              var qlabel = document.createElement("p");
+              qlabel.style.margin = "8px 0 2px";
+              qlabel.textContent = "第 " + (parseInt(qk, 10) + 1) + " 题：" + (book.oralQuestions ? book.oralQuestions[qk] : "");
+              var oaudio = document.createElement("audio");
+              oaudio.controls = true;
+              oaudio.src = bp.oralRecordings[qk];
+              card.appendChild(qlabel);
+              card.appendChild(oaudio);
+            });
+          } else {
+            var onp = document.createElement("p");
+            onp.textContent = "🗣️ 问答题口述回答还没录";
+            card.appendChild(onp);
+          }
+          var recKeys = bp.recordings ? Object.keys(bp.recordings) : [];
+          if (recKeys.length) {
+            var rp = document.createElement("p");
+            rp.textContent = "🎙️ 跟读录音（点开就能听）：" ;
+            card.appendChild(rp);
+            recKeys.sort(function (a, b) { return a - b; }).forEach(function (pn) {
+              var label = document.createElement("p");
+              label.style.margin = "8px 0 2px";
+              label.textContent = "第 " + pn + " 页";
+              var audio = document.createElement("audio");
+              audio.controls = true;
+              audio.src = bp.recordings[pn];
+              card.appendChild(label);
+              card.appendChild(audio);
+            });
+          } else {
+            var np = document.createElement("p");
+            np.textContent = "🎙️ 还没有保存的跟读录音";
+            card.appendChild(np);
+          }
+          var wKeys = bp.wordRecordings ? Object.keys(bp.wordRecordings) : [];
+          if (wKeys.length) {
+            var wp = document.createElement("p");
+            wp.textContent = "🎙️ 读单词录音（点开就能听）：";
+            card.appendChild(wp);
+            wKeys.sort(function (a, b) { return a - b; }).forEach(function (wk) {
+              var wl = document.createElement("p");
+              wl.style.margin = "8px 0 2px";
+              wl.textContent = "单词：" + (book.words[wk] ? book.words[wk].word : "") + "（已录 " + wordTakes(bp, parseInt(wk, 10)) + " / 3 遍）";
+              var waudio = document.createElement("audio");
+              waudio.controls = true;
+              waudio.src = bp.wordRecordings[wk];
+              card.appendChild(wl);
+              card.appendChild(waudio);
+            });
+          }
+          var sKeys = bp.sentRecordings ? Object.keys(bp.sentRecordings) : [];
+          if (sKeys.length) {
+            var sp = document.createElement("p");
+            sp.textContent = "🎙️ 故事跟读录音（点开就能听）：";
+            card.appendChild(sp);
+            sKeys.sort().forEach(function (sk) {
+              var parts = sk.split("-");
+              var sl = document.createElement("p");
+              sl.style.margin = "8px 0 2px";
+              sl.textContent = "第 " + parts[0] + " 页 · 第 " + (parseInt(parts[1], 10) + 1) + " 句";
+              var saudio = document.createElement("audio");
+              saudio.controls = true;
+              saudio.src = bp.sentRecordings[sk];
+              card.appendChild(sl);
+              card.appendChild(saudio);
+            });
+          }
+          var reset = document.createElement("button");
+          reset.className = "reset-btn";
+          reset.textContent = "清除这本书的记录";
+          reset.addEventListener("click", function () {
+            progress.books[book.id] = { pagesDone: [], quizBest: null, recordings: {}, oralRecordings: {}, marks: {} };
+            saveProgress();
+            renderLedger();
+          });
+          card.appendChild(reset);
+          area.appendChild(card);
+        });
+      }
+
+      /* ================= Password gate ================= */
+      var GATE_KEY = "raz-unlocked-v1";
+      var gateUnlocked = false;
+      try { gateUnlocked = localStorage.getItem(GATE_KEY) === "1"; } catch (e) { /* storage unavailable */ }
+      document.getElementById("gate-form").addEventListener("submit", function (ev) {
+        ev.preventDefault();
+        var input = document.getElementById("gate-input");
+        var val = input.value.replace(/\s+/g, "").toUpperCase();
+        if (val === "AMY0011") {
+          gateUnlocked = true;
+          try { localStorage.setItem(GATE_KEY, "1"); } catch (e) { /* ignore */ }
+          document.getElementById("gate-error").classList.add("hidden");
+          goDashboard();
+        } else {
+          document.getElementById("gate-error").classList.remove("hidden");
+          input.value = "";
+          input.focus();
+        }
+      });
+
+      /* ================= Init ================= */
+      // Books whose quiz was already submitted in an earlier version count as completed for gems.
+      BOOKS.forEach(function (b) {
+        var bp0 = bookProg(b.id);
+        if (bp0.quizBest !== null && bp0.quizBest !== undefined && !progress.gemsEarned[b.id]) {
+          progress.gemsEarned[b.id] = true;
+        }
+      });
+      saveProgress();
+      updateGems();
+      if (INSPECT_OPEN || gateUnlocked) {
+        goDashboard();
+      } else {
+        showView("gate");
+        document.getElementById("gate-input").focus();
+      }
+    </script>
+  </body>
+</html>
